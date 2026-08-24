@@ -1,0 +1,16 @@
+{
+  "name": "tiger-resume",
+  "version": "1.0.0",
+  "description": "AI-powered Resume & Job Optimization Platform",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend/tiger-resume && npm run dev",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend/tiger-resume && npm run build && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend/tiger-resume && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
