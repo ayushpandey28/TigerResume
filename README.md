@@ -1,219 +1,578 @@
-# TigerResume
+# 🐯 TigerResume
 
-**AI-powered Resume & Job Optimization Platform**
+> AI-powered resume optimization and career analysis platform for students and job seekers.
 
-TigerResume helps job seekers analyze, optimize, and improve their resumes for specific job descriptions using AI-powered analysis and ATS-style scoring.
-
----
-
-## Features
-
-- **Resume Upload & Parsing** — Upload PDF resumes and extract structured data
-- **ATS-Style Scoring** — Get an ATS compatibility score with detailed breakdown
-- **Job Description Analysis** — Paste a JD and extract key requirements
-- **Job Matching** — Compare your resume against a job description
-- **Skill Gap Analysis** — Identify missing skills and get a learning roadmap
-- **AI Resume Optimization** — Get AI-powered suggestions to improve your resume
-- **Before/After Comparison** — See score improvements after optimization
-- **AI Resume Chat** — Ask questions about your resume and job fit
-- **GitHub Analysis** — Analyze your GitHub profile for portfolio insights
-- **LinkedIn Analysis** — Get suggestions to improve your LinkedIn profile
-- **Resume Templates** — Classic, Modern, and Creative templates
-- **History** — Track all your analyses and optimizations
+TigerResume is a full-stack web application designed to help users **create, analyze, optimize, and improve their resumes** using AI-powered tools. It combines ATS analysis, job matching, skill-gap analysis, GitHub/LinkedIn analysis, resume versioning, PDF generation, and an AI-powered resume assistant into one platform.
 
 ---
 
-## Tech Stack
+## 🚀 Features
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React, Next.js (App Router), JavaScript |
-| Backend | Node.js, Express.js, JavaScript |
-| Database | MongoDB, Mongoose |
-| AI | Google Gemini API (replaceable AI layer) |
-| File Storage | Cloudinary |
-| Auth | JWT, bcryptjs |
-| PDF | pdf-parse, jsPDF |
+### 📄 Resume Management
+
+- Upload and manage resumes
+- Resume parsing and text extraction
+- Resume editing and preview
+- Resume version management
+- Generate downloadable PDF resumes
+- Multiple professional resume templates
+  - Classic
+  - Modern
+  - Creative
+
+### 🤖 AI Resume Assistant
+
+- Ask questions about your resume
+- Get AI-powered resume insights
+- Analyze resume strengths and weaknesses
+- Receive personalized improvement recommendations
+- Improve professional summaries
+- Optimize experience and project descriptions
+
+### 🎯 ATS Resume Analysis
+
+- ATS compatibility analysis
+- Keyword matching
+- Formatting analysis
+- ATS score breakdown
+- Missing keyword identification
+- Resume optimization suggestions
+
+### 💼 Job Description Analysis
+
+- Add and manage job descriptions
+- AI-powered job description analysis
+- Identify required skills and keywords
+- Match resumes against specific job descriptions
+- Calculate resume-job compatibility
+
+### 📈 Resume Improvement
+
+- AI-powered resume optimization
+- Before/After comparison
+- Section-wise improvement suggestions
+- Improve professional summaries
+- Optimize work experience bullets
+- Optimize project descriptions
+- Apply selected improvements
+- Create new resume versions
+
+### 🧠 Skill Gap Analysis
+
+- Identify skills required for a target job
+- Compare existing skills with required skills
+- Find missing technical skills
+- Generate personalized skill-learning roadmaps
+
+### 🐙 GitHub Analysis
+
+- Analyze GitHub profiles
+- Analyze repositories and technical activity
+- Generate GitHub insights
+- Maintain GitHub analysis history
+
+### 💼 LinkedIn Analysis
+
+- Analyze LinkedIn profile information
+- Generate profile improvement suggestions
+- Maintain LinkedIn analysis history
+
+### 👤 User Profile & Authentication
+
+- User signup and login
+- JWT-based authentication
+- Protected API routes
+- User profile management
+- Secure access to personal resume data
+
+### 📊 Dashboard & History
+
+- Centralized dashboard
+- Resume history
+- ATS analysis history
+- Job matching history
+- Skill-gap history
+- AI analysis history
+- Chat history
 
 ---
 
-## Architecture
+# 🛠️ Tech Stack
 
-```
-Frontend (Next.js)
-    ↓
-Backend (Express.js)
-    ↓
-┌─────────────┬──────────────┬─────────────┐
-│  MongoDB    │  AI Service  │  Cloudinary  │
-│  (Data)     │  (Gemini)    │  (Files)     │
-└─────────────┴──────────────┴─────────────┘
-```
+## Frontend
 
-### AI Architecture
+- Next.js
+- React.js
+- JavaScript
+- CSS
+- Axios
+- React Context API
 
-```
-aiService.js (abstraction layer)
-    ↓
-geminiService.js (Gemini-specific)
-    ↓
-Structured JSON responses
-    ↓
-Validation before frontend
-```
+## Backend
 
-The AI layer is designed to be replaceable. The application works without Gemini for core features (upload, parsing, basic ATS scoring, templates, history).
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT Authentication
+- REST APIs
+
+## AI & Processing
+
+- Google Gemini API
+- AI-powered resume analysis
+- AI-powered resume optimization
+- AI job description analysis
+- AI resume chat
+- PDF text extraction
+- PDF generation
+
+## Developer Tools
+
+- Git
+- GitHub
+- npm
+- Nodemon
 
 ---
 
-## Folder Structure
+# 🏗️ Project Architecture
 
-```
-TigerResume/
-├── frontend/tiger-resume/    # Next.js app
-│   ├── app/                  # App Router pages
-│   ├── components/           # React components
-│   ├── lib/                  # Utilities
-│   ├── context/              # React context providers
-│   └── hooks/                # Custom hooks
+```text
+TigerResume
 │
-└── backend/                  # Express.js API
-    └── src/
-        ├── config/           # DB, Gemini, Cloudinary config
-        ├── controllers/      # Route handlers
-        ├── services/         # Business logic
-        ├── models/           # Mongoose models
-        ├── routes/           # API routes
-        ├── middlewares/      # Auth, upload, error handling
-        ├── validators/       # Input validation
-        └── utils/            # Helpers (JWT, logger, response)
+├── backend
+│   │
+│   ├── src
+│   │   ├── config
+│   │   ├── controllers
+│   │   ├── middlewares
+│   │   ├── models
+│   │   ├── routes
+│   │   ├── services
+│   │   │   ├── ai
+│   │   │   ├── ats
+│   │   │   ├── chat
+│   │   │   ├── job
+│   │   │   ├── profile
+│   │   │   └── resume
+│   │   ├── utils
+│   │   └── validators
+│   │
+│   ├── server.js
+│   ├── package.json
+│   └── .env.example
+│
+├── frontend
+│   │
+│   ├── app
+│   ├── components
+│   ├── context
+│   ├── hooks
+│   ├── lib
+│   ├── public
+│   ├── package.json
+│   └── .env.example
+│
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
 ---
 
-## Installation
+# 🔄 Application Workflow
 
-### Prerequisites
+```text
+                    ┌───────────────────┐
+                    │       User        │
+                    └─────────┬─────────┘
+                              │
+                              ▼
+                    ┌───────────────────┐
+                    │ TigerResume       │
+                    │ Frontend          │
+                    │ Next.js + React   │
+                    └─────────┬─────────┘
+                              │
+                         REST APIs
+                              │
+                              ▼
+                    ┌───────────────────┐
+                    │ Node.js + Express │
+                    │ Backend           │
+                    └──────┬─────┬──────┘
+                           │     │
+                ┌──────────┘     └──────────┐
+                ▼                           ▼
+       ┌─────────────────┐        ┌─────────────────┐
+       │ MongoDB Atlas   │        │ Google Gemini   │
+       │ Database        │        │ AI API          │
+       └─────────────────┘        └─────────────────┘
+```
 
-- Node.js 18+
-- MongoDB (local or Atlas)
-- Google Gemini API key (optional — core features work without it)
-- Cloudinary account (optional — for cloud file storage)
+---
 
-### Setup
+# 📌 Core Modules
+
+| Module | Description |
+|---|---|
+| Resume Management | Upload, edit, analyze and manage resumes |
+| ATS Analyzer | Analyze ATS compatibility and keywords |
+| Job Matching | Match resumes with job descriptions |
+| AI Optimizer | Improve resume content using AI |
+| Skill Gap | Identify missing skills and learning requirements |
+| AI Chat | Ask questions about resume and career |
+| GitHub Analysis | Analyze GitHub profile and activity |
+| LinkedIn Analysis | Analyze LinkedIn profile |
+| PDF Generator | Generate professional PDF resumes |
+| Dashboard | Centralized resume and career analytics |
+| Authentication | Secure user authentication and authorization |
+
+---
+
+# ⚙️ Installation & Setup
+
+## 1. Clone the Repository
 
 ```bash
-# Clone the repository
-git clone <repo-url>
+git clone https://github.com/ayushpandey28/TigerResume.git
 cd TigerResume
-
-# Install all dependencies
-npm run install:all
 ```
 
-### Environment Variables
+---
 
-#### Backend (`backend/.env`)
+## 2. Backend Setup
+
+Go to the backend directory:
+
+```bash
+cd backend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create a `.env` file:
+
+```text
+backend/.env
+```
+
+Example:
 
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/tigerresume
-JWT_SECRET=your-jwt-secret-here
+
+MONGODB_URI=your_mongodb_connection_string
+
+JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=7d
-GEMINI_API_KEY=your-gemini-api-key
-CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_API_KEY=your-cloudinary-key
-CLOUDINARY_API_SECRET=your-cloudinary-secret
+
+GEMINI_API_KEY=your_gemini_api_key
+
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
 FRONTEND_URL=http://localhost:3000
+
 NODE_ENV=development
 ```
 
-#### Frontend (`frontend/tiger-resume/.env.local`)
+> Never commit `.env` files or API keys to GitHub.
+
+Start the backend:
+
+```bash
+npm run dev
+```
+
+Backend:
+
+```text
+http://localhost:5000
+```
+
+---
+
+# 💻 Frontend Setup
+
+Open another terminal and go to:
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create:
+
+```text
+frontend/.env.local
+```
+
+Add:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ```
 
-### Running the Project
+Start the frontend:
 
 ```bash
-# Run both frontend and backend
 npm run dev
+```
 
-# Or run separately
-npm run dev:backend    # Backend on port 5000
-npm run dev:frontend   # Frontend on port 3000
+Frontend:
+
+```text
+http://localhost:3000
 ```
 
 ---
 
-## API Overview
+# 🔐 Authentication
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/health` | Health check |
-| `/api/auth` | Authentication (signup, login) |
-| `/api/resume` | Resume CRUD operations |
-| `/api/ats` | ATS scoring |
-| `/api/jobs` | Job description management |
-| `/api/job-match` | Resume-JD matching |
-| `/api/improvement` | Resume optimization |
-| `/api/skills` | Skill gap analysis |
-| `/api/github` | GitHub profile analysis |
-| `/api/linkedin` | LinkedIn analysis |
-| `/api/chat` | AI resume chat |
-| `/api/history` | Analysis history |
+TigerResume uses **JWT-based authentication**.
 
----
+Authentication flow:
 
-## ATS Scoring Approach
+```text
+Signup
+  ↓
+User Account
+  ↓
+JWT Token
+  ↓
+Authenticated API Requests
+  ↓
+Protected Resources
+```
 
-The ATS-style score is a **compatibility estimate**, not an actual ATS system score.
+Protected features include:
 
-It evaluates:
-- Keyword match against job description
-- Skills alignment
-- Job relevance of experience and projects
-- Resume structure and formatting
-- Section completeness
-
-> **Note:** This is an ATS-style compatibility score for guidance purposes. It does not represent the exact scoring used by any specific ATS system.
+- Resume management
+- ATS analysis
+- Job matching
+- AI analysis
+- Chat history
+- Skill-gap analysis
+- Profile analysis
+- Dashboard data
 
 ---
 
-## Gemini Integration
+# 🗄️ Database
 
-Gemini powers advanced features:
-- Deep resume analysis
-- Semantic job matching
-- AI-powered optimization suggestions
-- Resume chat
+TigerResume uses **MongoDB Atlas** for persistent data storage.
 
-If the Gemini API key is not configured:
-- Core features (upload, parsing, basic ATS, templates) continue to work
-- AI features show an "AI unavailable" message
-- No crashes or broken UI
+The application manages data related to:
 
----
-
-## Screenshots
-
-*Screenshots will be added as features are implemented.*
-
----
-
-## Future Improvements
-
-- Multiple AI provider support (OpenAI, Claude)
-- Cover letter generation
-- Interview preparation
-- Resume collaboration
-- Bulk job matching
-- Browser extension for job boards
-- Mobile-responsive PWA
+```text
+Users
+Resumes
+Resume Versions
+Job Descriptions
+ATS Results
+Job Matches
+Skill Gaps
+Analysis History
+Chat History
+Subscriptions
+Payments
+Files
+```
 
 ---
 
-## License
+# 🤖 AI Integration
 
-MIT
+TigerResume integrates Google's Gemini API to provide AI-powered functionality.
+
+AI capabilities include:
+
+- Resume analysis
+- Resume optimization
+- Professional summary improvement
+- Experience bullet optimization
+- Project description optimization
+- Job description analysis
+- Skill-gap analysis
+- AI resume chat
+- Career-oriented recommendations
+
+---
+
+# 📄 Resume Templates
+
+TigerResume currently provides three resume templates.
+
+### Classic
+
+A clean and traditional resume layout suitable for professional and ATS-focused applications.
+
+### Modern
+
+A modern professional design with structured sections and visual hierarchy.
+
+### Creative
+
+A visually distinctive design for users who want a more creative resume presentation.
+
+---
+
+# 📊 Example User Workflow
+
+```text
+Upload Resume
+      ↓
+Analyze ATS Score
+      ↓
+Add Target Job Description
+      ↓
+Match Resume With Job
+      ↓
+Identify Missing Skills & Keywords
+      ↓
+Run AI Resume Optimization
+      ↓
+Review Before / After Changes
+      ↓
+Apply Selected Improvements
+      ↓
+Create New Resume Version
+      ↓
+Download Optimized Resume
+```
+
+---
+
+# 🔒 Security
+
+TigerResume follows several security practices:
+
+- JWT authentication
+- Protected API routes
+- Environment-based secrets
+- Input validation
+- Error handling middleware
+- Rate limiting
+- `.env` protection through `.gitignore`
+
+> API keys, database credentials, JWT secrets and other sensitive environment variables should never be committed to the repository.
+
+---
+
+# 📁 Environment Variables
+
+Environment files are intentionally excluded from version control.
+
+Example files are provided:
+
+```text
+backend/.env.example
+frontend/.env.example
+```
+
+Create your local environment files using these examples.
+
+---
+
+# 🚀 Deployment
+
+TigerResume is designed to support a modern cloud deployment architecture.
+
+### Frontend
+
+Vercel
+
+### Backend
+
+Render
+
+### Database
+
+MongoDB Atlas
+
+### AI
+
+Google Gemini API
+
+Recommended production architecture:
+
+```text
+                    ┌───────────────┐
+                    │    Vercel     │
+                    │   Frontend    │
+                    └───────┬───────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │    Render     │
+                    │    Backend    │
+                    └───────┬───────┘
+                            │
+              ┌─────────────┴─────────────┐
+              │                           │
+              ▼                           ▼
+      ┌───────────────┐          ┌────────────────┐
+      │ MongoDB Atlas │          │  Gemini AI API │
+      └───────────────┘          └────────────────┘
+```
+
+---
+
+# 🎯 Project Objective
+
+The main objective of TigerResume is to simplify the resume-building and job-application process by bringing multiple career tools into a single platform.
+
+Instead of using separate tools for resume creation, ATS checking, job matching, skill analysis, and resume optimization, TigerResume provides an integrated workflow.
+
+---
+
+# 🔮 Future Improvements
+
+Potential future improvements include:
+
+- More professional resume templates
+- Advanced analytics dashboard
+- Job portal integrations
+- Automated job recommendations
+- LinkedIn profile synchronization
+- Cloud-based file storage
+- Advanced AI career recommendations
+- Improved resume scoring
+- Automated application tracking
+- Real-time collaborative resume editing
+
+---
+
+# 👨‍💻 Author
+
+## Ayush Pandey
+
+**B.Tech Computer Science & Engineering**
+** KIET Group of Institutions , Ghaziabad **
+
+GitHub:  
+https://github.com/ayushpandey28
+
+---
+
+# ⭐ Support
+
+If you find TigerResume useful, consider giving the repository a ⭐ on GitHub.
+
+---
+
+# 📜 License
+
+This project is developed for educational, learning, and portfolio purposes.
