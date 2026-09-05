@@ -110,7 +110,12 @@ body {
   background: var(--text-muted);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--text);
   font-weight: 700;
   line-height: 1.3;
@@ -521,6 +526,12 @@ label {
   box-shadow: var(--shadow-lg);
 }
 
+/* Landing hero brand */
+
+section[style*="linear-gradient(135deg, #1E293B 0%, #0F172A 100%)"] h1 {
+  color: #F8FAFC !important;
+}
+
 /* Responsive */
 
 @media (max-width: 1024px) {
@@ -612,7 +623,6 @@ label {
     size: auto;
   }
 
-  /* Hide navigation, actions, sidebars, headers, and controls */
   nav,
   aside,
   header,
@@ -627,7 +637,6 @@ label {
     display: none !important;
   }
 
-  /* Force pure white background and clear text regardless of active theme */
   html,
   body,
   .dashboard-layout,
@@ -671,7 +680,6 @@ label {
     color: #1E293B !important;
   }
 
-  /* Avoid awkward page breaks inside items */
   .resume-section,
   .experience-item,
   .education-item,
