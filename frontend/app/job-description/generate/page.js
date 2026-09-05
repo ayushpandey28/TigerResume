@@ -132,10 +132,9 @@ export default function JobDescriptionGeneratePage() {
         {/* Render Generated Result */}
         {generatedJob && (
           <div>
-            <div className="card" style={{ marginBottom: '16px', padding: '12px 20px', background: '#FEFCE8', borderColor: '#FDE047' }}>
-              <p style={{ fontSize: '13px', color: '#854D0E', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="card" style={{ marginBottom: '16px', padding: '12px 20px', background: 'rgba(202, 138, 4, 0.1)', borderColor: 'var(--warning)' }}>
+              <p style={{ fontSize: '13px', color: 'var(--warning)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FiStar /> Note: This is an <strong>AI-generated sample job description</strong> created for practice and matching. It has been automatically saved to your saved jobs list.
-
               </p>
             </div>
 

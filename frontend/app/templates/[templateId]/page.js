@@ -64,7 +64,7 @@ export default function TemplatePreviewPage() {
           <div className="card" style={{ padding: '40px', textAlign: 'center' }}>
             <h2>Invalid Template Selected</h2>
             <p style={{ color: 'var(--text-light)', marginBottom: '20px' }}>
-              The requested template template '{templateId}' does not exist.
+              The requested template '{templateId}' does not exist.
             </p>
             <Link href="/templates" className="btn btn-primary" style={{ textDecoration: 'none' }}>
               Back to Templates

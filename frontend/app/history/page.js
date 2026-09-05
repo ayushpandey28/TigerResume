@@ -47,9 +47,9 @@ export default function HistoryPage() {
       case 'ats': return <FiTarget style={{ color: 'var(--primary)' }} />;
       case 'job-match': return <FiBarChart2 style={{ color: 'var(--success)' }} />;
       case 'skill-gap': return <FiLayers style={{ color: 'var(--info)' }} />;
-      case 'github': return <FiGithub style={{ color: '#1E293B' }} />;
+      case 'github': return <FiGithub style={{ color: 'var(--text)' }} />;
       case 'linkedin': return <FiLinkedin style={{ color: '#0A66C2' }} />;
-      case 'chat': return <FiMessageCircle style={{ color: 'var(--accent)' }} />;
+      case 'chat': return <FiMessageCircle style={{ color: 'var(--primary)' }} />;
       default: return <FiClock style={{ color: 'var(--primary)' }} />;
     }
   };
@@ -92,7 +92,7 @@ export default function HistoryPage() {
             {items.map((item, idx) => (
               <div key={idx} className="card" style={{ padding: '18px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-                  <div style={{ fontSize: '20px', background: '#F8FAFC', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: '20px', background: 'var(--bg)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)' }}>
                     {getItemIcon(item.type)}
                   </div>
                   <div>

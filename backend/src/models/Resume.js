@@ -14,6 +14,22 @@ const resumeSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  originalDocument: {
+    storagePath: { type: String, default: '' },
+    originalFileName: { type: String, default: '' },
+    fileType: { type: String, default: 'application/pdf' },
+    fileSize: { type: Number, default: 0 },
+    pageCount: { type: Number, default: 1 },
+    fileUrl: { type: String, default: '' }
+  },
+  originalFileBuffer: {
+    type: Buffer,
+    select: false
+  },
+  documentModel: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null
+  },
   fileUrl: {
     type: String
   },
@@ -36,7 +52,8 @@ const resumeSchema = new mongoose.Schema({
     phone: { type: String, default: '' },
     location: { type: String, default: '' },
     linkedin: { type: String, default: '' },
-    github: { type: String, default: '' }
+    github: { type: String, default: '' },
+    website: { type: String, default: '' }
   },
   summary: {
     type: String,
@@ -45,10 +62,17 @@ const resumeSchema = new mongoose.Schema({
   skills: [{
     type: String
   }],
+  skillCategories: [{
+    name: { type: String, default: '' },
+    skills: [{ type: String }]
+  }],
   education: [{
     degree: { type: String, default: '' },
     institution: { type: String, default: '' },
     year: { type: String, default: '' },
+    startYear: { type: String, default: '' },
+    endYear: { type: String, default: '' },
+    cgpa: { type: String, default: '' },
     details: { type: String, default: '' }
   }],
   experience: [{
@@ -56,13 +80,15 @@ const resumeSchema = new mongoose.Schema({
     company: { type: String, default: '' },
     duration: { type: String, default: '' },
     location: { type: String, default: '' },
-    description: { type: String, default: '' }
+    description: { type: String, default: '' },
+    bullets: [{ type: String }]
   }],
   projects: [{
     name: { type: String, default: '' },
     description: { type: String, default: '' },
     technologies: [{ type: String }],
-    link: { type: String, default: '' }
+    link: { type: String, default: '' },
+    bullets: [{ type: String }]
   }],
   certifications: [{
     type: String

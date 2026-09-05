@@ -10,20 +10,26 @@ const getDashboardSummary = async (req, res, next) => {
   try {
     const userId = req.user._id;
 
-    // 1. Load active resume & latest version
-    const resume = await Resume.findOne({ user: userId }).sort({ updatedAt: -1 });
+    // 1. Load active resume, GitHub & LinkedIn profiles in parallel
+    const [resume, githubProfile, linkedinProfile] = await Promise.all([
+      Resume.findOne({ user: userId }).sort({ updatedAt: -1 }),
+      ProfileAnalysis.findOne({ user: userId, profileType: 'github' }).sort({ createdAt: -1 }),
+      ProfileAnalysis.findOne({ user: userId, profileType: 'linkedin' }).sort({ createdAt: -1 })
+    ]);
+
     let latestVersion = null;
+    let latestATS = null;
+    let latestJobMatch = null;
+    let latestSkillGap = null;
 
     if (resume) {
-      latestVersion = await ResumeVersion.findOne({ resume: resume._id }).sort({ version: -1 });
+      [latestVersion, latestATS, latestJobMatch, latestSkillGap] = await Promise.all([
+        ResumeVersion.findOne({ resume: resume._id }).sort({ version: -1 }),
+        ATSResult.findOne({ resume: resume._id, user: userId }).sort({ createdAt: -1 }),
+        JobMatch.findOne({ resume: resume._id, user: userId }).populate('jobDescription', 'title company').sort({ createdAt: -1 }),
+        SkillGap.findOne({ resume: resume._id, user: userId }).populate('jobDescription', 'title').sort({ createdAt: -1 })
+      ]);
     }
-
-    // 2. Load latest ATS, JobMatch, SkillGap, and Profiles
-    const latestATS = resume ? await ATSResult.findOne({ resume: resume._id, user: userId }).sort({ createdAt: -1 }) : null;
-    const latestJobMatch = resume ? await JobMatch.findOne({ resume: resume._id, user: userId }).populate('jobDescription', 'title company').sort({ createdAt: -1 }) : null;
-    const latestSkillGap = resume ? await SkillGap.findOne({ resume: resume._id, user: userId }).populate('jobDescription', 'title').sort({ createdAt: -1 }) : null;
-    const githubProfile = await ProfileAnalysis.findOne({ user: userId, profileType: 'github' }).sort({ createdAt: -1 });
-    const linkedinProfile = await ProfileAnalysis.findOne({ user: userId, profileType: 'linkedin' }).sort({ createdAt: -1 });
 
     // 3. Build Recent Activity Feed
     const activities = [];
@@ -39,7 +45,7 @@ const getDashboardSummary = async (req, res, next) => {
     if (latestATS) {
       activities.push({
         type: 'ats',
-        title: `ATS Analysis Score: ${latestATS.score}/100`,
+        title: `ATS Analysis Score: ${latestATS.overallScore}/100`,
         date: latestATS.createdAt
       });
     }
@@ -90,7 +96,7 @@ const getDashboardSummary = async (req, res, next) => {
         createdAt: latestVersion.createdAt
       } : null,
       latestATS: latestATS ? {
-        score: latestATS.score,
+        score: latestATS.overallScore,
         createdAt: latestATS.createdAt
       } : null,
       latestJobMatch: latestJobMatch ? {

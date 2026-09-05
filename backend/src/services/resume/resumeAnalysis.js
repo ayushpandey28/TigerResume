@@ -35,10 +35,9 @@ const analyzeResume = async (resumeId, userId) => {
   // Save in AnalysisHistory
   const historyRecord = await AnalysisHistory.create({
     userId,
-    type: 'resume-analysis',
+    type: 'optimization',
     resumeId: resume._id,
-    result: aiResult,
-    provider: 'gemini'
+    result: aiResult
   });
 
   return {

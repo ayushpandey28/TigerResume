@@ -39,7 +39,7 @@ export default function LinkedinAnalysis({ analysisData }) {
           <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginBottom: '4px' }}>
             Headline Review
           </h4>
-          <p style={{ fontSize: '13px', color: 'var(--text)', background: '#F8FAFC', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', margin: 0 }}>
+          <p style={{ fontSize: '13px', color: 'var(--text)', background: 'var(--bg)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', margin: 0 }}>
             {headline && headline !== 'Not provided' ? headline : 'No headline entered for evaluation.'}
           </p>
         </div>
@@ -48,7 +48,7 @@ export default function LinkedinAnalysis({ analysisData }) {
           <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginBottom: '4px' }}>
             About Summary Review
           </h4>
-          <p style={{ fontSize: '13px', color: 'var(--text)', background: '#F8FAFC', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', margin: 0, whiteSpace: 'pre-line' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text)', background: 'var(--bg)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', margin: 0, whiteSpace: 'pre-line' }}>
             {about && about !== 'Not provided' ? about : 'No About summary entered for evaluation.'}
           </p>
         </div>

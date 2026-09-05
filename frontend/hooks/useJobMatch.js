@@ -9,7 +9,7 @@ export const useJobMatch = () => {
   const matchJob = async (resumeId, jobDescriptionId) => {
     setLoading(true); setError(null);
     try {
-      const res = await api.post('/job-match/match', { resumeId, jobDescriptionId });
+      const res = await api.post('/job-match', { resumeId, jobDescriptionId });
       setMatchResult(res.data.data);
       return res.data.data;
     } catch (err) {

@@ -67,16 +67,18 @@ export default function SkillGap({
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {gaps.map((gap, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAFC', padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)', padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}>
                   <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>
                     {gap.skill} <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>({gap.type})</span>
                   </span>
-                  <span className="badge" style={{
-                    fontSize: '11px',
-                    textTransform: 'uppercase',
-                    background: gap.priority === 'high' ? '#FEE2E2' : gap.priority === 'medium' ? '#FEF3C7' : '#E2E8F0',
-                    color: gap.priority === 'high' ? '#991B1B' : gap.priority === 'medium' ? '#92400E' : '#475569'
-                  }}>
+                  <span
+                    className={`badge ${gap.priority === 'high' ? 'badge-danger' : gap.priority === 'medium' ? 'badge-warning' : ''}`}
+                    style={{
+                      fontSize: '11px',
+                      textTransform: 'uppercase',
+                      ...(gap.priority !== 'high' && gap.priority !== 'medium' ? { background: 'var(--border)', color: 'var(--text-light)' } : {})
+                    }}
+                  >
                     {gap.priority} Priority
                   </span>
                 </div>

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
+import { normalizeResumeData } from '../../lib/resumeNormalizer';
 
 export default function ResumeEditor({ resume, onSave, onCancel }) {
   const { user } = useAuth();
@@ -13,7 +14,8 @@ export default function ResumeEditor({ resume, onSave, onCancel }) {
       phone: resume?.contact?.phone || '',
       location: resume?.contact?.location || '',
       linkedin: resume?.contact?.linkedin || '',
-      github: resume?.contact?.github || ''
+      github: resume?.contact?.github || '',
+      website: resume?.contact?.website || ''
     },
     summary: resume?.summary || '',
     skillsStr: (resume?.skills || []).join(', '),
@@ -77,16 +79,17 @@ export default function ResumeEditor({ resume, onSave, onCancel }) {
         return;
       }
 
-      const updatedPayload = {
+      const updatedPayload = normalizeResumeData({
         title: formData.title,
         contact: formData.contact,
         summary: formData.summary,
         skills,
+        skillCategories: resume?.skillCategories,
         experience,
         education,
         projects,
         certifications
-      };
+      });
 
       await onSave(resume._id, updatedPayload);
       toast.success('Resume updated successfully! (New version created)');
@@ -153,6 +156,10 @@ export default function ResumeEditor({ resume, onSave, onCancel }) {
           <div>
             <label>GitHub URL</label>
             <input type="text" value={formData.contact.github} onChange={e => handleContactChange('github', e.target.value)} />
+          </div>
+          <div>
+            <label>Website / Portfolio URL</label>
+            <input type="text" value={formData.contact.website} onChange={e => handleContactChange('website', e.target.value)} />
           </div>
         </div>
 

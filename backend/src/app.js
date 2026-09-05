@@ -24,9 +24,31 @@ const app = express();
 // Security
 app.use(helmet());
 
-// CORS
+// CORS configuration (supports comma-separated list or single origin, plus dev fallbacks)
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
+  .split(',')
+  .map(url => url.trim().replace(/\/$/, ''));
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, Postman, server-to-server)
+    if (!origin) return callback(null, true);
+
+    try {
+      const parsedUrl = new URL(origin);
+      if (
+        allowedOrigins.includes(origin) ||
+        allowedOrigins.includes('*') ||
+        process.env.NODE_ENV !== 'production' ||
+        /\.vercel\.app$/.test(parsedUrl.hostname)
+      ) {
+        return callback(null, true);
+      }
+    } catch (e) {
+      // Invalid URL format in origin
+    }
+    return callback(new Error(`CORS policy does not allow access from origin: ${origin}`), false);
+  },
   credentials: true
 }));
 

@@ -92,11 +92,12 @@ const applyImprovement = async ({ resumeId, originalVersion, acceptedChanges }, 
     resume: resume._id,
     user: userId,
     version: newVersion,
-    resumeData: {
+    data: {
       title: resume.title,
       contact: resume.contact,
       summary: resume.summary,
       skills: resume.skills,
+      skillCategories: resume.skillCategories,
       experience: resume.experience,
       education: resume.education,
       projects: resume.projects,

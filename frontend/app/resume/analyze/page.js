@@ -113,12 +113,12 @@ export default function ResumeAnalyzePage() {
 
         {/* AI Unavailable Banner */}
         {aiUnavailable && (
-          <div className="card" style={{ padding: '24px', borderColor: 'var(--warning)', background: '#FEFCE8', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#92400E', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="card" style={{ padding: '24px', borderColor: 'var(--warning)', background: 'rgba(202, 138, 4, 0.1)', marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--warning)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FiAlertTriangle /> AI Analysis Unavailable
             </h3>
-            <p style={{ color: '#78350F', fontSize: '14px', marginBottom: '12px' }}>{unavailableMsg}</p>
-            <p style={{ fontSize: '13px', color: '#92400E' }}>
+            <p style={{ color: 'var(--text)', fontSize: '14px', marginBottom: '12px' }}>{unavailableMsg}</p>
+            <p style={{ fontSize: '13px', color: 'var(--text-light)' }}>
               Tip: You can still calculate your rule-based ATS Compatibility Score under <strong>ATS Score</strong> without requiring Gemini API credentials.
             </p>
           </div>

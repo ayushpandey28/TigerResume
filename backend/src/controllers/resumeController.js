@@ -1,7 +1,10 @@
+const fs = require('fs');
+const path = require('path');
 const Resume = require('../models/Resume');
 const ResumeVersion = require('../models/ResumeVersion');
 const pdfService = require('../services/resume/pdfService');
 const resumeParser = require('../services/resume/resumeParser');
+const documentModelService = require('../services/resume/documentModelService');
 const { cloudinary, isConfigured: isCloudinaryConfigured } = require('../config/cloudinary');
 const { success, error } = require('../utils/response');
 const logger = require('../utils/logger');
@@ -13,10 +16,29 @@ const uploadResume = async (req, res, next) => {
       return error(res, 'Please upload a PDF file', 400);
     }
 
-    // Extract text from PDF
-    const extractedText = await pdfService.extractText(req.file.buffer);
+    // Persist original file to local disk
+    const uploadDir = path.join(__dirname, '../../uploads/resumes');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    const safeName = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const diskFileName = `${Date.now()}_${safeName}`;
+    const storagePath = path.join(uploadDir, diskFileName);
+    fs.writeFileSync(storagePath, req.file.buffer);
 
-    // Parse extracted text into structured resume data
+    // Extract text, physical layout pages, and metadata from PDF
+    const { text: extractedText, pageCount, pages, info } = await pdfService.extractPdfDetails(req.file.buffer);
+
+    // Build Generic Layout-Aware Document Model (zero hardcoding, preserves actual layout)
+    const documentModel = documentModelService.buildDocumentModel(extractedText, {
+      fileType: req.file.mimetype,
+      fileName: req.file.originalname,
+      pageCount: pageCount || 1,
+      pages: pages || [],
+      info
+    });
+
+    // Parse extracted text into structured semantic resume data for ATS / Job Matching compatibility
     const parsedData = await resumeParser.parseResume(extractedText);
 
     // Cloudinary upload if configured
@@ -39,15 +61,25 @@ const uploadResume = async (req, res, next) => {
       }
     }
 
-    const title = parsedData.contact.name
-      ? `${parsedData.contact.name}'s Resume`
+    const title = (documentModel.header?.name || parsedData.contact.name)
+      ? `${documentModel.header?.name || parsedData.contact.name}'s Resume`
       : req.file.originalname.replace(/\.[^/.]+$/, '');
 
-    // Save Resume document in MongoDB
+    // Save Resume document in MongoDB with originalDocument, buffer backup, and documentModel
     const resume = await Resume.create({
       user: req.user._id,
       title,
       originalFileName: req.file.originalname,
+      originalDocument: {
+        storagePath,
+        originalFileName: req.file.originalname,
+        fileType: req.file.mimetype,
+        fileSize: req.file.size,
+        pageCount: pageCount || 1,
+        fileUrl
+      },
+      originalFileBuffer: req.file.buffer,
+      documentModel,
       fileUrl,
       filePublicId,
       fileType: req.file.mimetype,
@@ -56,6 +88,7 @@ const uploadResume = async (req, res, next) => {
       contact: parsedData.contact,
       summary: parsedData.summary,
       skills: parsedData.skills,
+      skillCategories: parsedData.skillCategories || [],
       education: parsedData.education,
       experience: parsedData.experience,
       projects: parsedData.projects,
@@ -68,7 +101,10 @@ const uploadResume = async (req, res, next) => {
       resume: resume._id,
       user: req.user._id,
       version: 1,
-      data: parsedData,
+      data: {
+        documentModel,
+        ...parsedData
+      },
       changes: 'Initial upload & parsing'
     });
 
@@ -113,7 +149,7 @@ const updateResume = async (req, res, next) => {
     }
 
     const {
-      title, contact, summary, skills,
+      title, contact, summary, skills, skillCategories,
       education, experience, projects, certifications
     } = req.body;
 
@@ -121,6 +157,7 @@ const updateResume = async (req, res, next) => {
     if (contact) resume.contact = { ...resume.contact, ...contact };
     if (summary !== undefined) resume.summary = summary;
     if (skills) resume.skills = skills;
+    if (skillCategories) resume.skillCategories = skillCategories;
     if (education) resume.education = education;
     if (experience) resume.experience = experience;
     if (projects) resume.projects = projects;
@@ -138,6 +175,7 @@ const updateResume = async (req, res, next) => {
         contact: resume.contact,
         summary: resume.summary,
         skills: resume.skills,
+        skillCategories: resume.skillCategories,
         education: resume.education,
         experience: resume.experience,
         projects: resume.projects,
@@ -163,6 +201,15 @@ const deleteResume = async (req, res, next) => {
     // Delete versions
     await ResumeVersion.deleteMany({ resume: resume._id });
 
+    // Clean up local disk file if exists
+    if (resume.originalDocument?.storagePath && fs.existsSync(resume.originalDocument.storagePath)) {
+      try {
+        fs.unlinkSync(resume.originalDocument.storagePath);
+      } catch (fsErr) {
+        logger.warn('Failed to unlink local resume file:', fsErr.message);
+      }
+    }
+
     // Cloudinary delete if exists
     if (resume.filePublicId && isCloudinaryConfigured && cloudinary) {
       try {
@@ -175,6 +222,131 @@ const deleteResume = async (req, res, next) => {
     await resume.deleteOne();
 
     return success(res, null, 'Resume deleted successfully');
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Stream original uploaded document (PDF) for view or download
+const getOriginalDocument = async (req, res, next) => {
+  try {
+    const resume = await Resume.findOne({ _id: req.params.id, user: req.user._id })
+      .select('+originalFileBuffer');
+
+    if (!resume) {
+      return error(res, 'Resume not found', 404);
+    }
+
+    let fileBuffer = null;
+
+    // 1. Try local disk storage
+    if (resume.originalDocument?.storagePath && fs.existsSync(resume.originalDocument.storagePath)) {
+      try {
+        fileBuffer = fs.readFileSync(resume.originalDocument.storagePath);
+      } catch (readErr) {
+        logger.warn('Failed to read from disk storage:', readErr.message);
+      }
+    }
+
+    // 2. Try database buffer backup
+    if (!fileBuffer && resume.originalFileBuffer) {
+      fileBuffer = resume.originalFileBuffer;
+    }
+
+    // 3. Fallback: If original buffer is not available (e.g. legacy resumes),
+    // synthesize PDF on the fly from documentModel or extractedText
+    if (!fileBuffer) {
+      logger.info('Synthesizing PDF fallback for resume without raw buffer');
+      const docModel = resume.documentModel || documentModelService.buildDocumentModel(resume.extractedText || '', {
+        fileType: resume.fileType,
+        fileName: resume.originalFileName
+      });
+      fileBuffer = await documentModelService.generateDocumentModelPdf(docModel, {
+        title: resume.title
+      });
+    }
+
+    const filename = resume.originalDocument?.originalFileName || resume.originalFileName || 'original_resume.pdf';
+    const isDownload = req.query.download === 'true';
+    const disposition = isDownload ? 'attachment' : 'inline';
+    const contentType = resume.originalDocument?.fileType || resume.fileType || 'application/pdf';
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `${disposition}; filename="${encodeURIComponent(filename)}"`);
+    return res.send(fileBuffer);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Update Document Model blocks directly
+const updateDocumentModel = async (req, res, next) => {
+  try {
+    const resume = await Resume.findOne({ _id: req.params.id, user: req.user._id });
+    if (!resume) {
+      return error(res, 'Resume not found', 404);
+    }
+
+    const { documentModel } = req.body;
+    if (!documentModel) {
+      return error(res, 'documentModel is required', 400);
+    }
+
+    resume.documentModel = documentModel;
+    resume.currentVersion = (resume.currentVersion || 1) + 1;
+    await resume.save();
+
+    await ResumeVersion.create({
+      resume: resume._id,
+      user: req.user._id,
+      version: resume.currentVersion,
+      data: {
+        documentModel,
+        contact: resume.contact,
+        summary: resume.summary,
+        skills: resume.skills,
+        skillCategories: resume.skillCategories,
+        education: resume.education,
+        experience: resume.experience,
+        projects: resume.projects,
+        certifications: resume.certifications
+      },
+      changes: `Updated document model to version ${resume.currentVersion}`
+    });
+
+    return success(res, resume, 'Document model updated successfully');
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Generate high-fidelity PDF from the edited Document Model
+const generateEditedPdf = async (req, res, next) => {
+  try {
+    const resume = await Resume.findOne({ _id: req.params.id, user: req.user._id });
+    if (!resume) {
+      return error(res, 'Resume not found', 404);
+    }
+
+    let docModel = resume.documentModel;
+    if (!docModel || !docModel.sections || docModel.sections.length === 0) {
+      docModel = documentModelService.buildDocumentModel(resume.extractedText || '', {
+        fileType: resume.fileType,
+        fileName: resume.originalFileName
+      });
+    }
+
+    const pdfBuffer = await documentModelService.generateDocumentModelPdf(docModel, {
+      title: resume.title
+    });
+
+    const candidateName = docModel.header?.name || resume.contact?.name || resume.title || 'Candidate';
+    const sanitizedName = candidateName.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const filename = `${sanitizedName}_Edited_Resume.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    return res.send(pdfBuffer);
   } catch (err) {
     next(err);
   }
@@ -257,14 +429,76 @@ const generatePdf = async (req, res, next) => {
       }
       targetData = {
         title: resume.title,
-        contact: targetVersion.contact,
-        summary: targetVersion.summary,
-        skills: targetVersion.skills,
-        experience: targetVersion.experience,
-        projects: targetVersion.projects,
-        education: targetVersion.education,
-        certifications: targetVersion.certifications
+        contact: targetVersion.data?.contact,
+        summary: targetVersion.data?.summary,
+        skills: targetVersion.data?.skills,
+        skillCategories: targetVersion.data?.skillCategories,
+        experience: targetVersion.data?.experience,
+        projects: targetVersion.data?.projects,
+        education: targetVersion.data?.education,
+        certifications: targetVersion.data?.certifications,
+        achievements: targetVersion.data?.achievements,
+        customSections: targetVersion.data?.customSections,
+        documentModel: targetVersion.data?.documentModel
       };
+    }
+
+    // Auto-repair fallback: If stored resume has empty section arrays but original file exists, re-extract & re-parse
+    if (
+      (!targetData.experience || targetData.experience.length === 0) &&
+      (!targetData.education || targetData.education.length === 0) &&
+      (!targetData.projects || targetData.projects.length === 0) &&
+      (!targetData.skills || targetData.skills.length === 0)
+    ) {
+      let bufferToParse = resume.originalFileBuffer;
+      const storagePath = resume.originalDocument?.storagePath;
+      if (!bufferToParse && storagePath && fs.existsSync(storagePath)) {
+        try {
+          bufferToParse = fs.readFileSync(storagePath);
+        } catch (readErr) {
+          logger.warn('Could not read original file from disk:', readErr.message);
+        }
+      }
+
+      if (bufferToParse) {
+        try {
+          const { text: refreshedText } = await pdfService.extractPdfDetails(bufferToParse);
+          if (refreshedText) {
+            const reParsed = await resumeParser.parseResume(refreshedText);
+            if (
+              (reParsed.experience && reParsed.experience.length > 0) ||
+              (reParsed.education && reParsed.education.length > 0) ||
+              (reParsed.skills && reParsed.skills.length > 0)
+            ) {
+              targetData = {
+                ...(typeof targetData.toObject === 'function' ? targetData.toObject() : targetData),
+                ...reParsed
+              };
+
+              // Asynchronously update MongoDB so subsequent accesses are instantaneous
+              Resume.updateOne(
+                { _id: resume._id },
+                {
+                  $set: {
+                    extractedText: refreshedText,
+                    contact: reParsed.contact,
+                    summary: reParsed.summary || resume.summary,
+                    skills: reParsed.skills,
+                    skillCategories: reParsed.skillCategories || [],
+                    education: reParsed.education,
+                    experience: reParsed.experience,
+                    projects: reParsed.projects,
+                    certifications: reParsed.certifications,
+                    achievements: reParsed.achievements || []
+                  }
+                }
+              ).catch(err => logger.warn('Background resume repair update failed:', err.message));
+            }
+          }
+        } catch (reErr) {
+          logger.warn('Auto-repair parsing failed:', reErr.message);
+        }
+      }
     }
 
     const pdfBuffer = await pdfService.generatePdfBuffer({
@@ -295,7 +529,10 @@ module.exports = {
   getResumeVersion,
   analyzeResumeWithAI,
   getResumeAnalysisHistory,
-  generatePdf
+  generatePdf,
+  getOriginalDocument,
+  updateDocumentModel,
+  generateEditedPdf
 };
 
 

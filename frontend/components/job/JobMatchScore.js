@@ -39,13 +39,14 @@ export default function JobMatchScore({ matchPercentage = 0, breakdown = {} }) {
               <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Match</span>
             </div>
           </div>
-          <span className="badge" style={{
-            background: matchPercentage >= 75 ? '#DCFCE7' : matchPercentage >= 50 ? '#FEF3C7' : '#FEE2E2',
-            color: matchPercentage >= 75 ? '#166534' : matchPercentage >= 50 ? '#92400E' : '#991B1B',
-            fontSize: '13px',
-            padding: '4px 12px',
-            marginTop: '12px'
-          }}>
+          <span
+            className={`badge ${matchPercentage >= 75 ? 'badge-success' : matchPercentage >= 50 ? 'badge-warning' : 'badge-danger'}`}
+            style={{
+              fontSize: '13px',
+              padding: '4px 12px',
+              marginTop: '12px'
+            }}
+          >
             {label} Match
           </span>
         </div>
@@ -60,7 +61,7 @@ export default function JobMatchScore({ matchPercentage = 0, breakdown = {} }) {
                   <span>{cat.label}</span>
                   <span>{cat.score} / {cat.max} pts</span>
                 </div>
-                <div style={{ height: '6px', width: '100%', background: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ height: '6px', width: '100%', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
                   <div style={{
                     height: '100%',
                     width: `${pct}%`,

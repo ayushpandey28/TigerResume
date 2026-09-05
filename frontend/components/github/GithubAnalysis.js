@@ -57,7 +57,7 @@ export default function GithubAnalysis({ analysisData }) {
           </h3>
           <div className="grid-2" style={{ gap: '16px' }}>
             {repositories.slice(0, 6).map((repo, idx) => (
-              <div key={idx} style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '14px', background: '#F8FAFC' }}>
+              <div key={idx} style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '14px', background: 'var(--bg)' }}>
                 <a href={repo.url} target="_blank" rel="noreferrer" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary)', textDecoration: 'none' }}>
                   {repo.name} ↗
                 </a>

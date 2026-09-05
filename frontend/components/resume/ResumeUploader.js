@@ -83,7 +83,8 @@ export default function ResumeUploader({ onUploadSuccess }) {
         <div style={{
           marginTop: '20px',
           padding: '16px',
-          background: '#F1F5F9',
+          background: 'var(--bg)',
+          border: '1px solid var(--border)',
           borderRadius: 'var(--radius-sm)',
           display: 'flex',
           alignItems: 'center',

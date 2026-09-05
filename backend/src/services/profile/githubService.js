@@ -106,7 +106,7 @@ const analyzeGitHubProfile = async (input, userId) => {
   // 3. Optional AI Insights
   let aiInsights = null;
   if (aiService.isAIAvailable()) {
-    aiInsights = await aiService.analyzeGitHubProfile({
+    aiInsights = await aiService.analyzeGitHub({
       username: profileData.login,
       bio: profileData.bio,
       topLanguages,

@@ -25,7 +25,9 @@ import {
   FiAward,
   FiFileText,
   FiTarget,
-  FiBarChart2
+  FiBarChart2,
+  FiSun,
+  FiMoon
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -83,6 +85,24 @@ export default function ProfilePage() {
   });
 
   const [newSkill, setNewSkill] = useState('');
+  const [currentTheme, setCurrentTheme] = useState('light');
+
+  useEffect(() => {
+    try {
+      const savedTheme = localStorage.getItem('tiger_resume_theme') || 'light';
+      setCurrentTheme(savedTheme);
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } catch (e) {}
+  }, []);
+
+  const handleThemeChange = (theme) => {
+    setCurrentTheme(theme);
+    try {
+      localStorage.setItem('tiger_resume_theme', theme);
+      document.documentElement.setAttribute('data-theme', theme);
+      toast.success(`${theme === 'dark' ? 'Dark' : 'Light'} theme activated`);
+    } catch (e) {}
+  };
 
   useEffect(() => {
     if (!authLoading && !authUser) {
@@ -366,6 +386,67 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Section: Appearance & Interface Theme */}
+        <div className="card" style={{ marginBottom: '24px', padding: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <h3 style={{ fontSize: '16px', fontWeight: 600, margin: '0 0 4px 0', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {currentTheme === 'dark' ? <FiMoon style={{ color: 'var(--primary)' }} /> : <FiSun style={{ color: 'var(--primary)' }} />} Interface Theme
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-light)', margin: 0 }}>
+                Choose your preferred interface appearance. The selected theme will persist across sessions.
+              </p>
+            </div>
+
+            {/* Toggle Controls */}
+            <div style={{ display: 'flex', background: 'var(--bg)', padding: '4px', borderRadius: '10px', border: '1px solid var(--border)', gap: '4px' }}>
+              <button
+                type="button"
+                onClick={() => handleThemeChange('light')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: currentTheme === 'light' ? 'var(--bg-card)' : 'transparent',
+                  color: currentTheme === 'light' ? 'var(--primary)' : 'var(--text-light)',
+                  boxShadow: currentTheme === 'light' ? 'var(--shadow)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <FiSun style={{ fontSize: '15px' }} /> Light
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleThemeChange('dark')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: currentTheme === 'dark' ? 'var(--bg-card)' : 'transparent',
+                  color: currentTheme === 'dark' ? 'var(--primary)' : 'var(--text-light)',
+                  boxShadow: currentTheme === 'dark' ? 'var(--shadow)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <FiMoon style={{ fontSize: '15px' }} /> Dark
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Edit / View Grid */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Section B: Personal Information */}
@@ -410,7 +491,7 @@ export default function ProfilePage() {
                     type="email"
                     value={formData.email}
                     disabled
-                    style={{ background: '#F1F5F9', cursor: 'not-allowed' }}
+                    style={{ background: 'var(--bg)', cursor: 'not-allowed' }}
                   />
                 </div>
                 <div>
@@ -469,7 +550,7 @@ export default function ProfilePage() {
 
                 <div>
                   <label style={{ fontSize: '12px', color: 'var(--text-light)', display: 'block', marginBottom: '4px' }}>Career Summary</label>
-                  <div style={{ fontSize: '13.5px', color: 'var(--text)', lineHeight: '1.6', background: '#F8FAFC', padding: '12px 16px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: '13.5px', color: 'var(--text)', lineHeight: '1.6', background: 'var(--bg)', padding: '12px 16px', borderRadius: '6px', border: '1px solid var(--border)' }}>
                     {formData.summary || 'No career summary provided yet.'}
                   </div>
                 </div>
@@ -560,7 +641,8 @@ export default function ProfilePage() {
                     key={idx}
                     className="badge"
                     style={{
-                      background: '#F1F5F9',
+                      background: 'var(--bg)',
+                      border: '1px solid var(--border)',
                       color: 'var(--text)',
                       fontSize: '13px',
                       padding: '6px 12px',
@@ -606,7 +688,7 @@ export default function ProfilePage() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {formData.education.map((edu, i) => (
-                    <div key={i} style={{ padding: '14px', background: '#F8FAFC', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                    <div key={i} style={{ padding: '14px', background: 'var(--bg)', borderRadius: '6px', border: '1px solid var(--border)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                         <h4 style={{ fontSize: '14px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                           {edu.degree || 'Degree'}
@@ -626,14 +708,14 @@ export default function ProfilePage() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {formData.education.map((edu, i) => (
-                  <div key={i} style={{ padding: '16px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid var(--border)', position: 'relative' }}>
+                  <div key={i} style={{ padding: '16px', background: 'var(--bg)', borderRadius: '8px', border: '1px solid var(--border)', position: 'relative' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
                       <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--primary)' }}>Education #{i + 1}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveEducation(i)}
                         className="btn btn-outline"
-                        style={{ padding: '4px 8px', fontSize: '12px', color: 'var(--danger)', borderColor: '#FEE2E2' }}
+                        style={{ padding: '4px 8px', fontSize: '12px', color: 'var(--danger)', borderColor: 'var(--border)' }}
                       >
                         <FiTrash2 /> Remove
                       </button>
@@ -701,7 +783,7 @@ export default function ProfilePage() {
             {!isEditing ? (
               <div className="grid-2" style={{ gap: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <FiGithub style={{ fontSize: '18px', color: '#1E293B' }} />
+                  <FiGithub style={{ fontSize: '18px', color: 'var(--text)' }} />
                   <div>
                     <label style={{ fontSize: '11px', color: 'var(--text-light)', display: 'block' }}>GitHub</label>
                     {formData.links.github ? (

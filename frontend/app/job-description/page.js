@@ -80,7 +80,7 @@ export default function JobDescriptionPage() {
         await loadJobs();
       }
     } catch (err) {
-      toast.error('Failed to analyze job description');
+      toast.error(err.response?.data?.message || 'Failed to analyze job description');
     } finally {
       setAnalyzingId(null);
     }

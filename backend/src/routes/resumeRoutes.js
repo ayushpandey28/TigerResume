@@ -10,7 +10,10 @@ const {
   getResumeVersion,
   analyzeResumeWithAI,
   getResumeAnalysisHistory,
-  generatePdf
+  generatePdf,
+  getOriginalDocument,
+  updateDocumentModel,
+  generateEditedPdf
 } = require('../controllers/resumeController');
 
 const { upload } = require('../middlewares/uploadMiddleware');
@@ -25,8 +28,15 @@ router.get('/:id', getResume);
 router.put('/:id', updateResume);
 router.delete('/:id', deleteResume);
 
-// PDF Generation route
+// Original Document route (unaltered uploaded file stream / download)
+router.get('/:id/original', getOriginalDocument);
+
+// Document Model routes (generic layout editor)
+router.put('/:id/document-model', updateDocumentModel);
+
+// PDF Generation routes
 router.post('/:id/pdf', generatePdf);
+router.post('/:id/pdf/edited', generateEditedPdf);
 
 // AI Analysis routes
 router.post('/:id/analyze', apiLimiter, analyzeResumeWithAI);

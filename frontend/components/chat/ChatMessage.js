@@ -20,7 +20,7 @@ export default function ChatMessage({ role, content }) {
           width: '32px',
           height: '32px',
           borderRadius: '50%',
-          background: isUser ? 'var(--primary)' : 'var(--accent)',
+          background: isUser ? 'var(--primary)' : 'var(--secondary-light)',
           color: 'white',
           display: 'flex',
           alignItems: 'center',
@@ -34,7 +34,8 @@ export default function ChatMessage({ role, content }) {
 
         {/* Message Content */}
         <div style={{
-          background: isUser ? 'var(--primary)' : '#F1F5F9',
+          background: isUser ? 'var(--primary)' : 'var(--bg)',
+          border: isUser ? 'none' : '1px solid var(--border)',
           color: isUser ? 'white' : 'var(--text)',
           padding: '12px 16px',
           borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',

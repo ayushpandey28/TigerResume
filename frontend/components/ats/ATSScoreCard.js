@@ -30,13 +30,14 @@ export default function ATSScoreCard({ score = 0 }) {
         </div>
       </div>
 
-      <span className="badge" style={{
-        background: score >= 75 ? '#DCFCE7' : score >= 50 ? '#FEF3C7' : '#FEE2E2',
-        color: score >= 75 ? '#166534' : score >= 50 ? '#92400E' : '#991B1B',
-        fontSize: '14px',
-        padding: '6px 16px',
-        marginTop: '8px'
-      }}>
+      <span
+        className={`badge ${score >= 75 ? 'badge-success' : score >= 50 ? 'badge-warning' : 'badge-danger'}`}
+        style={{
+          fontSize: '14px',
+          padding: '6px 16px',
+          marginTop: '8px'
+        }}
+      >
         {label}
       </span>
 

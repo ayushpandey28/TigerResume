@@ -7,9 +7,9 @@ export default function Navbar() {
 
   return (
     <nav style={{
-      height: 'var(--navbar-height)', background: 'white', borderBottom: '1px solid var(--border)',
+      height: 'var(--navbar-height)', background: 'var(--bg-card)', borderBottom: '1px solid var(--border)',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px',
-      position: 'sticky', top: 0, zIndex: 100, boxShadow: 'var(--shadow)'
+      position: 'sticky', top: 0, zIndex: 100, boxShadow: 'var(--shadow)', transition: 'background-color 0.2s ease, border-color 0.2s ease'
     }}>
       <Link href="/" style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text)', textDecoration: 'none' }}>
         🐯 Tiger<span style={{ color: 'var(--primary)' }}>Resume</span>

@@ -2,40 +2,185 @@ const gemini = require('../../config/gemini');
 const prompts = require('./prompts');
 const logger = require('../../utils/logger');
 
-const callGemini = async (prompt) => {
+const wait = (ms) => new Promise(res => setTimeout(res, ms));
+
+const GEMINI_TIMEOUT_MS = parseInt(process.env.GEMINI_TIMEOUT_MS, 10) || 12000;
+const GEMINI_MAX_RETRIES = 2; // Maximum 2 attempts total (1 initial + 1 retry)
+
+const withTimeout = (promise, timeoutMs = GEMINI_TIMEOUT_MS) => {
+  let timer;
+  const timeoutPromise = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      const err = new Error('Gemini API call timed out');
+      err.code = 'TIMEOUT';
+      reject(err);
+    }, timeoutMs);
+  });
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    clearTimeout(timer);
+  });
+};
+
+const formatAIError = (err) => {
+  const msg = err?.message || '';
+  const isBusy = msg.includes('503') ||
+    msg.includes('high demand') ||
+    msg.includes('Service Unavailable') ||
+    msg.includes('429') ||
+    msg.includes('Resource has been exhausted') ||
+    err?.code === 'TIMEOUT' ||
+    msg.includes('timed out');
+
+  if (isBusy) {
+    const error = new Error('AI service is temporarily busy. Please try again in a moment.');
+    error.statusCode = 503;
+    error.isAIBusy = true;
+    return error;
+  }
+
+  const error = new Error(`AI processing failed: ${msg}`);
+  error.statusCode = 500;
+  return error;
+};
+
+const parseJSONSafely = (text) => {
+  if (!text || typeof text !== 'string') return {};
+  const cleaned = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
   try {
-    const model = gemini.getModel();
-    if (!model) throw new Error('Gemini model not available');
-
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-
-    // Try to parse JSON from response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+    return JSON.parse(cleaned);
+  } catch (e) {
+    const match = cleaned.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+    if (match) {
+      try {
+        return JSON.parse(match[0]);
+      } catch (innerErr) {
+        const sanitized = match[0].replace(/,\s*([}\]])/g, '$1');
+        return JSON.parse(sanitized);
+      }
     }
-
     throw new Error('Response did not contain valid JSON');
-  } catch (err) {
-    logger.error('Gemini API call failed:', err.message);
-    throw new Error(`AI processing failed: ${err.message}`);
   }
 };
 
-const callGeminiText = async (prompt) => {
-  try {
-    const model = gemini.getModel();
-    if (!model) throw new Error('Gemini model not available');
-
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text();
-  } catch (err) {
-    logger.error('Gemini API call failed:', err.message);
-    throw new Error(`AI processing failed: ${err.message}`);
+const callGemini = async (prompt, maxRetries = GEMINI_MAX_RETRIES) => {
+  let activeModel = gemini.getModel();
+  if (!activeModel) {
+    const err = new Error('AI service is not configured or unavailable');
+    err.statusCode = 503;
+    throw err;
   }
+
+  let lastError = null;
+  let usedFallback = false;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await withTimeout(activeModel.generateContent(prompt));
+      const response = result.response;
+      const text = response.text();
+
+      return parseJSONSafely(text);
+    } catch (err) {
+      lastError = err;
+
+      // If configured model returned 404 / unavailable, seamlessly try fallback model
+      const isModelError = err.message && (
+        err.message.includes('404') ||
+        err.message.includes('not found') ||
+        err.message.includes('no longer available')
+      );
+
+      if (isModelError && !usedFallback) {
+        const fallback = gemini.getFallbackModel();
+        if (fallback) {
+          logger.warn('Primary Gemini model unavailable, switching to fallback model...');
+          activeModel = fallback;
+          usedFallback = true;
+          attempt--;
+          continue;
+        }
+      }
+
+      const isTemporary = err.message && (
+        err.message.includes('503') ||
+        err.message.includes('high demand') ||
+        err.message.includes('429') ||
+        err.code === 'TIMEOUT'
+      );
+
+      if (isTemporary && attempt < maxRetries) {
+        const delay = 1500; // Fast bounded delay of 1.5s
+        logger.warn(`Gemini API busy (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms...`);
+        await wait(delay);
+        continue;
+      }
+
+      logger.error('Gemini API call failed:', err.message);
+      throw formatAIError(err);
+    }
+  }
+
+  throw formatAIError(lastError);
+};
+
+const callGeminiText = async (prompt, maxRetries = GEMINI_MAX_RETRIES) => {
+  let activeModel = gemini.getModel();
+  if (!activeModel) {
+    const err = new Error('AI service is not configured or unavailable');
+    err.statusCode = 503;
+    throw err;
+  }
+
+  let lastError = null;
+  let usedFallback = false;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await withTimeout(activeModel.generateContent(prompt));
+      const response = result.response;
+      return response.text();
+    } catch (err) {
+      lastError = err;
+
+      // If configured model returned 404 / unavailable, seamlessly try fallback model
+      const isModelError = err.message && (
+        err.message.includes('404') ||
+        err.message.includes('not found') ||
+        err.message.includes('no longer available')
+      );
+
+      if (isModelError && !usedFallback) {
+        const fallback = gemini.getFallbackModel();
+        if (fallback) {
+          logger.warn('Primary Gemini model unavailable, switching to fallback model...');
+          activeModel = fallback;
+          usedFallback = true;
+          attempt--;
+          continue;
+        }
+      }
+
+      const isTemporary = err.message && (
+        err.message.includes('503') ||
+        err.message.includes('high demand') ||
+        err.message.includes('429') ||
+        err.code === 'TIMEOUT'
+      );
+
+      if (isTemporary && attempt < maxRetries) {
+        const delay = 1500;
+        logger.warn(`Gemini API busy (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms...`);
+        await wait(delay);
+        continue;
+      }
+
+      logger.error('Gemini API call failed:', err.message);
+      throw formatAIError(err);
+    }
+  }
+
+  throw formatAIError(lastError);
 };
 
 

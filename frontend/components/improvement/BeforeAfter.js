@@ -20,7 +20,7 @@ export default function BeforeAfter({ title, original, improved, reason, isAccep
 
       <div className="grid-2" style={{ gap: '16px', marginBottom: '12px' }}>
         {/* Before */}
-        <div style={{ background: '#F8FAFC', padding: '12px 16px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+        <div style={{ background: 'var(--bg)', padding: '12px 16px', borderRadius: '6px', border: '1px solid var(--border)' }}>
           <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Before (Original)</span>
           <p style={{ fontSize: '13px', color: 'var(--text)', marginTop: '4px', lineHeight: '1.5', whiteSpace: 'pre-line' }}>
             {original || '—'}
@@ -28,9 +28,9 @@ export default function BeforeAfter({ title, original, improved, reason, isAccep
         </div>
 
         {/* After */}
-        <div style={{ background: '#F0FDF4', padding: '12px 16px', borderRadius: '6px', border: '1px solid #BBF7D0' }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: '#166534', textTransform: 'uppercase' }}>After (AI Improved)</span>
-          <p style={{ fontSize: '13px', color: '#14532D', marginTop: '4px', lineHeight: '1.5', whiteSpace: 'pre-line', fontWeight: 500 }}>
+        <div style={{ background: 'rgba(34, 197, 94, 0.08)', padding: '12px 16px', borderRadius: '6px', border: '1px solid rgba(34, 197, 94, 0.25)' }}>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--success)', textTransform: 'uppercase' }}>After (AI Improved)</span>
+          <p style={{ fontSize: '13px', color: 'var(--text)', marginTop: '4px', lineHeight: '1.5', whiteSpace: 'pre-line', fontWeight: 500 }}>
             {improved || '—'}
           </p>
         </div>

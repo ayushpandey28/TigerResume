@@ -52,7 +52,7 @@ export default function Home() {
       </section>
 
       <footer style={{ background: 'var(--secondary)', color: 'var(--text-muted)', padding: '24px', textAlign: 'center', fontSize: '14px' }}>
-        © 2024 TigerResume. Built for job seekers who want an edge.
+        © 2026 TigerResume. Built for job seekers who want an edge.
       </footer>
     </div>
   );

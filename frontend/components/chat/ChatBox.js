@@ -90,7 +90,7 @@ export default function ChatBox({ resumeId, jobDescriptionId }) {
   return (
     <div className="card" style={{ padding: '0', display: 'flex', flexDirection: 'column', height: '620px' }}>
       {/* Chat Header */}
-      <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FAFAFA' }}>
+      <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-card)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <FiMessageSquare style={{ color: 'var(--primary)', fontSize: '18px' }} />
           <h3 style={{ fontSize: '15px', fontWeight: 600, margin: 0, color: 'var(--text)' }}>
@@ -101,7 +101,7 @@ export default function ChatBox({ resumeId, jobDescriptionId }) {
           <button
             onClick={handleClearChat}
             className="btn btn-outline"
-            style={{ fontSize: '12px', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--danger)', borderColor: '#FEE2E2' }}
+            style={{ fontSize: '12px', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--danger)', borderColor: 'var(--border)' }}
           >
             <FiTrash2 /> Reset Chat
           </button>
@@ -109,7 +109,7 @@ export default function ChatBox({ resumeId, jobDescriptionId }) {
       </div>
 
       {/* Messages Stream */}
-      <div style={{ flex: 1, padding: '24px', overflowY: 'auto', background: '#FFFFFF' }}>
+      <div style={{ flex: 1, padding: '24px', overflowY: 'auto', background: 'var(--bg-card)' }}>
         {fetchingHistory ? (
           <p style={{ textAlign: 'center', fontSize: '13px', color: 'var(--text-muted)' }}>Loading chat history...</p>
         ) : messages.length === 0 ? (
@@ -130,7 +130,7 @@ export default function ChatBox({ resumeId, jobDescriptionId }) {
                   onClick={() => handleSend(sug)}
                   className="badge"
                   style={{
-                    background: '#F1F5F9',
+                    background: 'var(--bg)',
                     color: 'var(--primary)',
                     border: '1px solid var(--border)',
                     padding: '8px 14px',
@@ -160,7 +160,7 @@ export default function ChatBox({ resumeId, jobDescriptionId }) {
       </div>
 
       {/* Message Input Controls */}
-      <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', background: '#FAFAFA' }}>
+      <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', background: 'var(--bg-card)' }}>
         <form
           onSubmit={e => { e.preventDefault(); handleSend(); }}
           style={{ display: 'flex', gap: '12px', alignItems: 'center' }}

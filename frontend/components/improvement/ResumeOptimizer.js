@@ -180,8 +180,8 @@ export default function ResumeOptimizer() {
       {/* Improvements Review */}
       {improvements && improvements.improvements && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <div className="card" style={{ padding: '16px 24px', background: '#F0FDF4', borderColor: '#BBF7D0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px', color: '#166534', fontWeight: 500 }}>
+          <div className="card" style={{ padding: '16px 24px', background: 'rgba(34, 197, 94, 0.08)', borderColor: 'rgba(34, 197, 94, 0.25)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '14px', color: 'var(--success)', fontWeight: 500 }}>
               Review proposed changes below. Check the items you want to keep before applying.
             </span>
             <button

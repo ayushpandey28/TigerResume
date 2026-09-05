@@ -98,7 +98,7 @@ export default function JobAnalysis({ jobDescription }) {
       )}
 
       {/* Requirements Metadata */}
-      <div className="grid-2" style={{ background: '#F8FAFC', padding: '12px 16px', borderRadius: '8px', fontSize: '13px' }}>
+      <div className="grid-2" style={{ background: 'var(--bg)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: '8px', fontSize: '13px' }}>
         <div>
           <strong>Experience Required:</strong> {experience}
         </div>

@@ -24,9 +24,9 @@ export default function Sidebar() {
   const pathname = usePathname();
   return (
     <aside style={{
-      width: 'var(--sidebar-width)', background: 'white', borderRight: '1px solid var(--border)',
+      width: 'var(--sidebar-width)', background: 'var(--bg-card)', borderRight: '1px solid var(--border)',
       height: 'calc(100vh - var(--navbar-height))', position: 'fixed', top: 'var(--navbar-height)',
-      left: 0, overflowY: 'auto', padding: '16px 0'
+      left: 0, overflowY: 'auto', padding: '16px 0', transition: 'background-color 0.2s ease, border-color 0.2s ease'
     }}>
       {menuItems.map(item => {
         const isActive = pathname === item.href || pathname.startsWith(item.href + '/');

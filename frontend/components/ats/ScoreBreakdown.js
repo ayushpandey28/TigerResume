@@ -34,7 +34,7 @@ export default function ScoreBreakdown({ breakdown = {}, hasJD = false }) {
               <div style={{
                 height: '8px',
                 width: '100%',
-                background: '#E2E8F0',
+                background: 'var(--border)',
                 borderRadius: '4px',
                 overflow: 'hidden'
               }}>

@@ -129,6 +129,34 @@ export const fetchResumeVersion = async (id, version) => {
   return response.data;
 };
 
+export const updateResumeDocumentModel = async (id, documentModel) => {
+  const response = await api.put(`/resume/${id}/document-model`, { documentModel });
+  return response.data;
+};
+
+export const getOriginalResumeUrl = (id, download = false) => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  return `${baseUrl}/resume/${id}/original${download ? '?download=true' : ''}`;
+};
+
+export const getOriginalResumeBlob = async (id) => {
+  const response = await api.get(`/resume/${id}/original`, {
+    responseType: 'blob'
+  });
+  return response.data;
+};
+
+export const generateEditedResumePdf = async (id) => {
+  const response = await api.post(
+    `/resume/${id}/pdf/edited`,
+    {},
+    {
+      responseType: 'blob'
+    }
+  );
+  return response.data;
+};
+
 // ============================================================
 // ATS API
 // ============================================================

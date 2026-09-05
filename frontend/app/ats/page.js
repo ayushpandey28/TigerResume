@@ -104,7 +104,7 @@ export default function AtsPage() {
             </div>
 
             {/* Mode selection description */}
-            <div style={{ background: '#F8FAFC', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <div style={{ background: 'var(--bg)', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
               <p style={{ fontSize: '12px', color: 'var(--text-light)', lineHeight: '1.5' }}>
                 <strong>Analysis Mode:</strong> {jobText.trim() ? 'Resume + Job Description Match' : 'General Resume ATS Check'}
               </p>

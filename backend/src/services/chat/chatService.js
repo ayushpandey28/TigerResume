@@ -75,7 +75,7 @@ const sendMessage = async ({ resumeId, jobDescriptionId, message }, userId) => {
   const contextPayload = {
     resumeData: resumePayload,
     jobData: jobPayload,
-    atsData: atsResult ? { score: atsResult.score, missingKeywords: atsResult.missingKeywords } : null,
+    atsData: atsResult ? { score: atsResult.overallScore, missingKeywords: atsResult.missingKeywords } : null,
     jobMatchData: jobMatchResult ? { matchPercentage: jobMatchResult.matchPercentage, matchedSkills: jobMatchResult.matchedSkills, missingSkills: jobMatchResult.missingSkills } : null,
     skillGapData: skillGapResult ? { skillCoverage: skillGapResult.skillCoverage, missingRequiredSkills: skillGapResult.missingRequiredSkills } : null,
     profileData: profiles.length > 0 ? profiles.map(p => ({ type: p.profileType, url: p.profileUrl, data: p.analysis })) : null,
