@@ -2,7 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const helmet = require('helmet');
+const mongoose = require('mongoose');
 const { apiLimiter } = require('./middlewares/rateLimit');
+const dbMiddleware = require('./middlewares/dbMiddleware');
 const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
 
 // Route imports
@@ -20,6 +22,9 @@ const historyRoutes = require('./routes/historyRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
+
+// Trust reverse proxy (Vercel, Heroku, AWS ALB) for accurate client IP resolution
+app.set('trust proxy', 1);
 
 // Security
 app.use(helmet());
@@ -61,13 +66,23 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
+// Health check (responds fast, non-blocking, reports live db connection state)
+app.get('/api/health', (req, res) => {
+  const readyState = mongoose.connection.readyState;
+  const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    service: 'TigerResume API',
+    database: states[readyState] || 'unknown'
+  });
+});
+
 // Rate limiting
 app.use('/api/', apiLimiter);
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'TigerResume API' });
-});
+// Database connection middleware (ensures Mongoose is connected before querying in serverless & traditional environments)
+app.use('/api', dbMiddleware);
 
 // Routes
 app.use('/api/auth', authRoutes);
