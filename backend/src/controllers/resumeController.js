@@ -16,15 +16,24 @@ const uploadResume = async (req, res, next) => {
       return error(res, 'Please upload a PDF file', 400);
     }
 
-    // Persist original file to local disk
-    const uploadDir = path.join(__dirname, '../../uploads/resumes');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    // Persist original file to local disk (in dev mode only; serverless like Vercel uses MongoDB buffer & Cloudinary)
+    let storagePath = '';
+    const isServerless = process.env.VERCEL || process.env.NODE_ENV === 'production';
+    if (!isServerless) {
+      try {
+        const uploadDir = path.join(__dirname, '../../uploads/resumes');
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const safeName = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const diskFileName = `${Date.now()}_${safeName}`;
+        storagePath = path.join(uploadDir, diskFileName);
+        fs.writeFileSync(storagePath, req.file.buffer);
+      } catch (fsErr) {
+        logger.warn('Local disk write skipped:', fsErr.message);
+        storagePath = '';
+      }
     }
-    const safeName = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const diskFileName = `${Date.now()}_${safeName}`;
-    const storagePath = path.join(uploadDir, diskFileName);
-    fs.writeFileSync(storagePath, req.file.buffer);
 
     // Extract text, physical layout pages, and metadata from PDF
     const { text: extractedText, pageCount, pages, info } = await pdfService.extractPdfDetails(req.file.buffer);
@@ -65,7 +74,7 @@ const uploadResume = async (req, res, next) => {
       ? `${documentModel.header?.name || parsedData.contact.name}'s Resume`
       : req.file.originalname.replace(/\.[^/.]+$/, '');
 
-    // Save Resume document in MongoDB with originalDocument, buffer backup, and documentModel
+    // Save Resume document in MongoDB with originalDocument, buffer backup, documentModel, and all parsed sections
     const resume = await Resume.create({
       user: req.user._id,
       title,
@@ -93,6 +102,8 @@ const uploadResume = async (req, res, next) => {
       experience: parsedData.experience,
       projects: parsedData.projects,
       certifications: parsedData.certifications,
+      achievements: parsedData.achievements || [],
+      customSections: parsedData.customSections || [],
       currentVersion: 1
     });
 
@@ -150,7 +161,8 @@ const updateResume = async (req, res, next) => {
 
     const {
       title, contact, summary, skills, skillCategories,
-      education, experience, projects, certifications
+      education, experience, projects, certifications,
+      achievements, customSections
     } = req.body;
 
     if (title) resume.title = title;
@@ -162,6 +174,8 @@ const updateResume = async (req, res, next) => {
     if (experience) resume.experience = experience;
     if (projects) resume.projects = projects;
     if (certifications) resume.certifications = certifications;
+    if (achievements) resume.achievements = achievements;
+    if (customSections) resume.customSections = customSections;
 
     resume.currentVersion += 1;
     await resume.save();
@@ -179,7 +193,9 @@ const updateResume = async (req, res, next) => {
         education: resume.education,
         experience: resume.experience,
         projects: resume.projects,
-        certifications: resume.certifications
+        certifications: resume.certifications,
+        achievements: resume.achievements,
+        customSections: resume.customSections
       },
       changes: `Updated to version ${resume.currentVersion}`
     });

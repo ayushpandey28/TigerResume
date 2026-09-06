@@ -93,6 +93,15 @@ const resumeSchema = new mongoose.Schema({
   certifications: [{
     type: String
   }],
+  achievements: [{
+    type: String
+  }],
+  customSections: [{
+    title: { type: String, default: '' },
+    items: [{ type: String }],
+    bullets: [{ type: String }],
+    content: { type: String, default: '' }
+  }],
   currentVersion: {
     type: Number,
     default: 1

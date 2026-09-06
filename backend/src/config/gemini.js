@@ -5,18 +5,20 @@ const logger = require('../utils/logger');
 let genAI = null;
 let model = null;
 
-let GEMINI_MODEL = (
-  process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite'
-).trim();
+let rawModel = (process.env.GEMINI_MODEL || 'gemini-1.5-flash').trim();
 
-if (!GEMINI_MODEL || /\s/.test(GEMINI_MODEL)) {
+// Map legacy or invalid model names to official Google Generative AI models
+const validModels = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-2.5-flash'];
+let GEMINI_MODEL = rawModel;
+
+if (!validModels.includes(rawModel)) {
   logger.warn(
-    `Invalid Gemini model name "${GEMINI_MODEL}". Defaulting to "gemini-3.5-flash-lite".`
+    `Unsupported or non-standard Gemini model name "${rawModel}". Standardizing to "gemini-1.5-flash".`
   );
-
-  GEMINI_MODEL = 'gemini-3.5-flash-lite';
+  GEMINI_MODEL = 'gemini-1.5-flash';
 }
 
+let fallbackModel = null;
 const apiKey = process.env.GEMINI_API_KEY;
 
 if (
@@ -32,7 +34,7 @@ if (
       model: GEMINI_MODEL
     });
 
-    const fallbackModelName = GEMINI_MODEL === 'gemini-3.6-flash' ? 'gemini-3.5-flash-lite' : 'gemini-3.6-flash';
+    const fallbackModelName = GEMINI_MODEL === 'gemini-1.5-flash' ? 'gemini-2.0-flash' : 'gemini-1.5-flash';
     fallbackModel = genAI.getGenerativeModel({
       model: fallbackModelName
     });

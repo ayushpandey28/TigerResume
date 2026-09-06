@@ -543,8 +543,27 @@ section[style*="linear-gradient(135deg, #1E293B 0%, #0F172A 100%)"] h1 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  .nav-user-name {
+    display: none !important;
+  }
+
+  .app-sidebar {
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+
+  .app-sidebar.sidebar-open {
+    transform: translateX(0);
+    box-shadow: var(--shadow-lg);
+  }
+
   .dashboard-content {
-    margin-left: 0;
+    margin-left: 0 !important;
+    width: 100% !important;
   }
 }
 
