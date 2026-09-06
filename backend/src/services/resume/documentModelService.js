@@ -1,3 +1,4 @@
+require('../../utils/pdfFontLoader');
 const PDFDocument = require('pdfkit');
 const logger = require('../../utils/logger');
 

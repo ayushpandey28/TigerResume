@@ -1,3 +1,4 @@
+require('../../utils/pdfFontLoader');
 const PDFDocument = require('pdfkit');
 const pdfParse = require('pdf-parse');
 const zlib = require('zlib');
