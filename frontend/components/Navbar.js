@@ -40,21 +40,23 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav style={{
+    <nav className="navbar-container" style={{
       height: 'var(--navbar-height)',
       background: 'var(--bg-card)',
       borderBottom: '1px solid var(--border)',
       display: 'flex',
       alignItems: 'center',
-      justify: 'space-between',
+      justifyContent: 'space-between',
       padding: '0 16px',
       position: 'sticky',
       top: 0,
       zIndex: 100,
       boxShadow: 'var(--shadow)',
-      transition: 'background-color 0.2s ease, border-color 0.2s ease'
+      transition: 'background-color 0.2s ease, border-color 0.2s ease',
+      maxWidth: '100%',
+      overflowX: 'clip'
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className="navbar-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {user && (
           <button
             onClick={toggleSidebar}
@@ -78,7 +80,7 @@ export default function Navbar() {
         </Link>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: 'auto' }}>
         <button
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
@@ -105,6 +107,9 @@ export default function Navbar() {
             <Link href="/profile" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-light)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
               👤 <span className="nav-user-name">{user.name}</span>
             </Link>
+            <Link href="/dashboard" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-light)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+              Dashboard
+            </Link>
             <button onClick={logout} className="btn btn-outline" style={{ padding: '5px 12px', fontSize: '12px' }}>Logout</button>
           </>
         ) : (
@@ -117,4 +122,3 @@ export default function Navbar() {
     </nav>
   );
 }
-
