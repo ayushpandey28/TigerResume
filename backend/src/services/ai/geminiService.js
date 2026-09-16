@@ -148,7 +148,9 @@ const parseJSONSafely = (text) => {
     // 2. Extract JSON structure (object or array) from surrounding text
     const match = cleaned.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
     if (match) {
-      const extracted = match[0].trim();
+      let extracted = match[0].trim();
+      // Remove any lingering code fence markers inside the matched block
+      extracted = extracted.replace(/```(?:json)?|```/gi, '').trim();
       try {
         return JSON.parse(extracted);
       } catch (err2) {

@@ -1,4 +1,5 @@
 'use client';
+import { FiCheckCircle, FiCompass } from 'react-icons/fi';
 
 export default function SkillRoadmap({ roadmap = [] }) {
   if (!roadmap || roadmap.length === 0) {
@@ -6,13 +7,16 @@ export default function SkillRoadmap({ roadmap = [] }) {
       <div className="card" style={{ padding: '24px' }}>
         <h3
           style={{
-            fontSize: '16px',
+            fontSize: '15px',
             fontWeight: 600,
             color: 'var(--success)',
-            marginBottom: '8px'
+            marginBottom: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
           }}
         >
-          🎉 Zero Learning Skill Gaps
+          <FiCheckCircle size={16} /> Complete Skill Alignment
         </h3>
 
         <p
@@ -32,13 +36,16 @@ export default function SkillRoadmap({ roadmap = [] }) {
     <div className="card" style={{ padding: '24px' }}>
       <h3
         style={{
-          fontSize: '16px',
+          fontSize: '15px',
           fontWeight: 600,
           marginBottom: '20px',
-          color: 'var(--primary)'
+          color: 'var(--primary)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px'
         }}
       >
-        🗺️ Recommended Learning Roadmap
+        <FiCompass size={16} /> Target Skill Roadmap
       </h3>
 
       <div

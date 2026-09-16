@@ -121,7 +121,7 @@ export default function JobDescriptionGeneratePage() {
               disabled={generating}
               style={{ width: '100%', padding: '12px', fontSize: '15px' }}
             >
-              {generating ? 'Gemini AI is generating sample Job Description...' : '✨ Generate AI Sample Job Description'}
+              {generating ? 'Generating sample Job Description...' : 'Generate Sample Job Description'}
             </button>
           </form>
         </div>

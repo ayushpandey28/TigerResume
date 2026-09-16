@@ -8,7 +8,7 @@ const logger = require('../utils/logger');
  */
 const dbMiddleware = async (req, res, next) => {
   // Allow health check to respond even if DB is connecting or check its status separately
-  if (req.path === '/api/health') {
+  if (req.path === '/health' || req.originalUrl === '/api/health' || req.path === '/api/health') {
     return next();
   }
 

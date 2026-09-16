@@ -38,5 +38,8 @@ const atsResultSchema = new mongoose.Schema({
   timestamps: true
 });
 
+atsResultSchema.index({ user: 1, createdAt: -1 });
+atsResultSchema.index({ resume: 1, createdAt: -1 });
+
 module.exports = mongoose.model('ATSResult', atsResultSchema);
 

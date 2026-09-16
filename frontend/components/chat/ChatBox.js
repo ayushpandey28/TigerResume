@@ -152,8 +152,9 @@ export default function ChatBox({ resumeId, jobDescriptionId }) {
         )}
 
         {loading && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--primary)', fontStyle: 'italic', margin: '12px 0' }}>
-            <span>🐯 Thinking & analyzing resume context...</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-light)', margin: '12px 0' }}>
+            <span className="spinner" style={{ width: '14px', height: '14px', borderWidth: '2px', borderTopColor: 'var(--primary)' }} />
+            <span>Analyzing resume context and composing response...</span>
           </div>
         )}
         <div ref={messagesEndRef} />

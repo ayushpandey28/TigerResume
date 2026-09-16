@@ -3,6 +3,7 @@ const JobMatch = require('../models/JobMatch');
 const SkillGap = require('../models/SkillGap');
 const ProfileAnalysis = require('../models/ProfileAnalysis');
 const ChatHistory = require('../models/ChatHistory');
+const AnalysisHistory = require('../models/AnalysisHistory');
 const { success, error } = require('../utils/response');
 
 const getHistory = async (req, res, next) => {
@@ -15,12 +16,13 @@ const getHistory = async (req, res, next) => {
     const profileQuery = { user: userId };
     if (type === 'github' || type === 'linkedin') profileQuery.profileType = type;
 
-    const [atsRecords, matchRecords, gapRecords, profileRecords, chatRecords] = await Promise.all([
+    const [atsRecords, matchRecords, gapRecords, profileRecords, chatRecords, analysisRecords] = await Promise.all([
       (!type || type === 'ats') ? ATSResult.find({ user: userId }).sort({ createdAt: -1 }) : Promise.resolve([]),
       (!type || type === 'job-match') ? JobMatch.find({ user: userId }).populate('jobDescription', 'title company').sort({ createdAt: -1 }) : Promise.resolve([]),
       (!type || type === 'skill-gap') ? SkillGap.find({ user: userId }).populate('jobDescription', 'title').sort({ createdAt: -1 }) : Promise.resolve([]),
       (!type || type === 'github' || type === 'linkedin') ? ProfileAnalysis.find(profileQuery).sort({ createdAt: -1 }) : Promise.resolve([]),
-      (!type || type === 'chat') ? ChatHistory.find({ user: userId }).populate('resume', 'title originalFileName').sort({ updatedAt: -1 }) : Promise.resolve([])
+      (!type || type === 'chat') ? ChatHistory.find({ user: userId }).populate('resume', 'title originalFileName').sort({ updatedAt: -1 }) : Promise.resolve([]),
+      (!type || type === 'resume-analysis') ? AnalysisHistory.find({ userId, type: 'resume-analysis' }).populate('resumeId', 'title originalFileName').sort({ createdAt: -1 }) : Promise.resolve([])
     ]);
 
     // 1. ATS History
@@ -86,6 +88,18 @@ const getHistory = async (req, res, next) => {
       });
     });
 
+    // 6. AI Resume Analysis History
+    analysisRecords.forEach(r => {
+      items.push({
+        id: r._id,
+        type: 'resume-analysis',
+        title: 'AI Resume Semantic Analysis',
+        subtitle: `Resume: ${r.resumeId?.title || r.resumeId?.originalFileName || 'Resume'}`,
+        createdAt: r.createdAt,
+        details: r.result
+      });
+    });
+
     // Sort timeline by date descending
     items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -113,6 +127,9 @@ const getHistoryItem = async (req, res, next) => {
 
     item = await ChatHistory.findOne({ _id: id, user: req.user._id }).populate('resume');
     if (item) return success(res, { type: 'chat', data: item });
+
+    item = await AnalysisHistory.findOne({ _id: id, userId: req.user._id }).populate('resumeId');
+    if (item) return success(res, { type: item.type, data: item });
 
     return error(res, 'History item not found', 404);
   } catch (err) {

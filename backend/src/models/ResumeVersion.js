@@ -27,5 +27,8 @@ const resumeVersionSchema = new mongoose.Schema({
   timestamps: true
 });
 
+resumeVersionSchema.index({ resume: 1, version: -1 });
+resumeVersionSchema.index({ user: 1 });
+
 module.exports = mongoose.model('ResumeVersion', resumeVersionSchema);
 

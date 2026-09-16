@@ -1,4 +1,5 @@
 'use client';
+import { FiCheck, FiAlertCircle } from 'react-icons/fi';
 
 export default function MissingKeywords({ matchedKeywords = [], missingKeywords = [] }) {
   return (
@@ -9,8 +10,8 @@ export default function MissingKeywords({ matchedKeywords = [], missingKeywords 
 
       {/* Matched Keywords */}
       <div style={{ marginBottom: '16px' }}>
-        <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--info)', marginBottom: '8px' }}>
-          ✓ Matched Keywords ({matchedKeywords.length})
+        <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--info)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <FiCheck size={13} /> Matched Keywords ({matchedKeywords.length})
         </h4>
         {matchedKeywords.length === 0 ? (
           <p style={{ fontSize: '13px', color: 'var(--text-light)' }}>No specific keyword alignment found.</p>
@@ -28,8 +29,8 @@ export default function MissingKeywords({ matchedKeywords = [], missingKeywords 
       {/* Missing Keywords */}
       {missingKeywords.length > 0 && (
         <div>
-          <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--warning)', marginBottom: '8px' }}>
-            ⚠ Recommended Keywords to Incorporate ({missingKeywords.length})
+          <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--warning)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <FiAlertCircle size={13} /> Recommended Keywords to Incorporate ({missingKeywords.length})
           </h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
             {missingKeywords.slice(0, 15).map((kw, index) => (

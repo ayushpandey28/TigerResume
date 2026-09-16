@@ -1,4 +1,5 @@
 'use client';
+import { FiCheckCircle, FiAlertTriangle, FiTrendingUp, FiFileText } from 'react-icons/fi';
 
 export default function LinkedinAnalysis({ analysisData }) {
   if (!analysisData) return null;
@@ -31,8 +32,8 @@ export default function LinkedinAnalysis({ analysisData }) {
 
       {/* Review Details */}
       <div className="card" style={{ padding: '24px' }}>
-        <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px', color: 'var(--text)' }}>
-          📌 Profile Section Highlights
+        <h3 style={{ fontSize: '15px', fontWeight: 600, marginBottom: '16px', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <FiFileText size={15} style={{ color: 'var(--primary)' }} /> Profile Section Highlights
         </h3>
 
         <div style={{ marginBottom: '16px' }}>
@@ -55,10 +56,10 @@ export default function LinkedinAnalysis({ analysisData }) {
       </div>
 
       {/* Strengths & Gaps */}
-      <div className="grid-2">
-        <div className="card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--success)', marginBottom: '12px' }}>
-            ✓ Profile Strengths
+      <div className="grid-2" style={{ gap: '16px' }}>
+        <div className="card" style={{ padding: '20px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--success)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiCheckCircle size={15} /> Profile Strengths
           </h3>
           <ul style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text)' }}>
             {strengths.map((str, i) => (
@@ -67,9 +68,9 @@ export default function LinkedinAnalysis({ analysisData }) {
           </ul>
         </div>
 
-        <div className="card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--danger)', marginBottom: '12px' }}>
-            ⚠ Areas for Improvement
+        <div className="card" style={{ padding: '20px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--danger)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiAlertTriangle size={15} /> Areas for Improvement
           </h3>
           <ul style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text)' }}>
             {gaps.map((g, i) => (
@@ -81,9 +82,9 @@ export default function LinkedinAnalysis({ analysisData }) {
 
       {/* Actionable Suggestions */}
       {suggestions.length > 0 && (
-        <div className="card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--primary)', marginBottom: '12px' }}>
-            💡 Recommended LinkedIn Profile Enhancements
+        <div className="card" style={{ padding: '20px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiTrendingUp size={15} /> Recommended LinkedIn Profile Enhancements
           </h3>
           <ol style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text)', lineHeight: '1.6' }}>
             {suggestions.map((sug, i) => (

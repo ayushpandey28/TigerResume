@@ -24,8 +24,8 @@ export default function JobAnalysis({ jobDescription }) {
           {company && <p style={{ fontSize: '14px', color: 'var(--text-light)' }}>{company}</p>}
         </div>
         {isAIGenerated && (
-          <span className="badge badge-warning" style={{ fontSize: '12px' }}>
-            🤖 AI-Generated Sample
+          <span className="badge badge-warning" style={{ fontSize: '11px' }}>
+            Sample Posting
           </span>
         )}
       </div>

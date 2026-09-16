@@ -171,7 +171,7 @@ export default function ResumeOptimizer() {
           disabled={loading || resumes.length === 0}
           style={{ width: '100%', padding: '12px', fontSize: '15px' }}
         >
-          {loading ? 'Gemini AI is analyzing improvements...' : '✨ Run AI Resume Optimization'}
+          {loading ? 'Analyzing resume improvements...' : 'Run Resume Optimization'}
         </button>
       </div>
 

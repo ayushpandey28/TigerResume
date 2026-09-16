@@ -4,20 +4,40 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FiHome, FiUser, FiFileText, FiTarget, FiBarChart2, FiTrendingUp, FiLayers, FiBriefcase, FiGithub, FiLinkedin, FiMessageCircle, FiGrid, FiClock } from 'react-icons/fi';
 
-const menuItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: <FiHome /> },
-  { href: '/profile', label: 'My Profile', icon: <FiUser /> },
-  { href: '/resume', label: 'My Resume', icon: <FiFileText /> },
-  { href: '/ats', label: 'ATS Score', icon: <FiTarget /> },
-  { href: '/job-match', label: 'Job Match', icon: <FiBarChart2 /> },
-  { href: '/resume/improve', label: 'Resume Improve', icon: <FiTrendingUp /> },
-  { href: '/skill-gap', label: 'Skill Gap', icon: <FiLayers /> },
-  { href: '/job-description', label: 'Job Description', icon: <FiBriefcase /> },
-  { href: '/github', label: 'GitHub Analysis', icon: <FiGithub /> },
-  { href: '/linkedin', label: 'LinkedIn Analysis', icon: <FiLinkedin /> },
-  { href: '/ask-resume', label: 'Ask Resume', icon: <FiMessageCircle /> },
-  { href: '/templates', label: 'Templates', icon: <FiGrid /> },
-  { href: '/history', label: 'History', icon: <FiClock /> }
+const menuSections = [
+  {
+    title: 'WORKSPACE',
+    items: [
+      { href: '/dashboard', label: 'Dashboard', icon: <FiHome size={16} /> },
+      { href: '/resume', label: 'My Resume', icon: <FiFileText size={16} /> },
+      { href: '/job-description', label: 'Job Descriptions', icon: <FiBriefcase size={16} /> }
+    ]
+  },
+  {
+    title: 'ANALYSIS',
+    items: [
+      { href: '/ats', label: 'ATS Score', icon: <FiTarget size={16} /> },
+      { href: '/job-match', label: 'Job Match', icon: <FiBarChart2 size={16} /> },
+      { href: '/resume/improve', label: 'Resume Improve', icon: <FiTrendingUp size={16} /> },
+      { href: '/skill-gap', label: 'Skill Gap', icon: <FiLayers size={16} /> }
+    ]
+  },
+  {
+    title: 'PROFILE',
+    items: [
+      { href: '/profile', label: 'My Profile', icon: <FiUser size={16} /> },
+      { href: '/github', label: 'GitHub Analysis', icon: <FiGithub size={16} /> },
+      { href: '/linkedin', label: 'LinkedIn Analysis', icon: <FiLinkedin size={16} /> }
+    ]
+  },
+  {
+    title: 'TOOLS',
+    items: [
+      { href: '/ask-resume', label: 'Ask Resume AI', icon: <FiMessageCircle size={16} /> },
+      { href: '/templates', label: 'Templates', icon: <FiGrid size={16} /> },
+      { href: '/history', label: 'History', icon: <FiClock size={16} /> }
+    ]
+  }
 ];
 
 export default function Sidebar() {
@@ -51,9 +71,7 @@ export default function Sidebar() {
             position: 'fixed',
             inset: 0,
             background: 'rgba(15, 23, 42, 0.5)',
-            backdropFilter: 'blur(3px)',
-            zIndex: 190,
-            transition: 'opacity 0.2s ease'
+            zIndex: 190
           }}
         />
       )}
@@ -69,37 +87,58 @@ export default function Sidebar() {
           top: 'var(--navbar-height)',
           left: 0,
           overflowY: 'auto',
-          padding: '16px 0',
+          padding: '12px 0 24px 0',
           zIndex: 200,
-          transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, border-color 0.2s ease'
+          transition: 'transform 0.2s ease, background-color 0.15s ease, border-color 0.15s ease'
         }}
       >
-        {menuItems.map(item => {
-          const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'));
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={closeSidebar}
+        {menuSections.map((section, sIdx) => (
+          <div key={sIdx} style={{ marginBottom: '12px' }}>
+            <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '10px 20px',
-                fontSize: '14px',
-                fontWeight: isActive ? 600 : 400,
-                color: isActive ? 'var(--primary)' : 'var(--text-light)',
-                background: isActive ? 'rgba(249,115,22,0.08)' : 'transparent',
-                borderRight: isActive ? '3px solid var(--primary)' : '3px solid transparent',
-                textDecoration: 'none',
-                transition: 'all 0.15s'
+                padding: '8px 20px 4px 20px',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                letterSpacing: '0.05em'
               }}
             >
-              {item.icon}
-              {item.label}
-            </Link>
-          );
-        })}
+              {section.title}
+            </div>
+
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              {section.items.map(item => {
+                const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={closeSidebar}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '7px 12px',
+                      margin: '1px 8px',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '13.5px',
+                      fontWeight: isActive ? 600 : 400,
+                      color: isActive ? 'var(--primary)' : 'var(--text-light)',
+                      background: isActive ? 'var(--primary-subtle)' : 'transparent',
+                      textDecoration: 'none',
+                      transition: 'background-color 0.15s ease, color 0.15s ease'
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', color: isActive ? 'var(--primary)' : 'var(--text-muted)' }}>
+                      {item.icon}
+                    </span>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        ))}
       </aside>
     </>
   );

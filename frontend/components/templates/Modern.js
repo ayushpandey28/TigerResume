@@ -30,12 +30,12 @@ export default function Modern({ resume, customization = {} }) {
           {contact.name || resume.title || 'Untitled Candidate'}
         </h1>
         <div style={{ fontSize: '13px', color: '#4B5563', marginTop: '6px', display: 'flex', flexWrap: 'wrap', gap: '8px 16px', fontWeight: 500, wordBreak: 'break-word' }}>
-          {contact.email && <span>✉ {contact.email}</span>}
-          {contact.phone && <span>📞 {contact.phone}</span>}
-          {contact.location && <span>📍 {contact.location}</span>}
-          {contact.linkedin && <span>🔗 {contact.linkedin}</span>}
-          {contact.github && <span>💻 {contact.github}</span>}
-          {contact.website && <span>🌐 {contact.website}</span>}
+          {contact.email && <span>{contact.email}</span>}
+          {contact.phone && <span>{contact.phone}</span>}
+          {contact.location && <span>{contact.location}</span>}
+          {contact.linkedin && <span>{contact.linkedin}</span>}
+          {contact.github && <span>{contact.github}</span>}
+          {contact.website && <span>{contact.website}</span>}
         </div>
       </div>
 

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
+import { FiArrowRight } from 'react-icons/fi';
 
 export default function SignUp() {
   const [name, setName] = useState('');
@@ -37,34 +38,182 @@ export default function SignUp() {
   };
 
   return (
-    <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-      <div className="card" style={{ width: '100%', maxWidth: '420px' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '8px', textAlign: 'center' }}>Sign Up</h1>
-        <p style={{ color: 'var(--text-light)', textAlign: 'center', marginBottom: '24px', fontSize: '14px' }}>Create your TigerResume account</p>
+    <div style={{
+      minHeight: 'calc(100vh - var(--navbar-height))',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '32px 16px',
+      background: 'var(--bg)'
+    }}>
+      <div className="card" style={{
+        width: '100%',
+        maxWidth: '420px',
+        padding: '32px',
+        boxShadow: 'var(--shadow-md)',
+        border: '1px solid var(--border)'
+      }}>
+        {/* Brand header */}
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '6px',
+            background: 'var(--primary)',
+            color: '#ffffff',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 800,
+            fontSize: '15px',
+            marginBottom: '12px',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+          }}>
+            TR
+          </div>
+          <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text)', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
+            Create your account
+          </h1>
+          <p style={{ fontSize: '13px', color: 'var(--text-light)', margin: 0 }}>
+            Start optimizing your resume for enterprise ATS parsers
+          </p>
+        </div>
+
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '16px' }}>
-            <label>Full Name</label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" required />
+          <div style={{ marginBottom: '14px' }}>
+            <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 500, color: 'var(--text)', marginBottom: '6px' }}>
+              Full name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Jane Doe"
+              required
+              autoFocus
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-input)',
+                color: 'var(--text)',
+                fontSize: '13.5px',
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+            />
           </div>
-          <div style={{ marginBottom: '16px' }}>
-            <label>Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+
+          <div style={{ marginBottom: '14px' }}>
+            <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 500, color: 'var(--text)', marginBottom: '6px' }}>
+              Work or personal email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="jane@example.com"
+              required
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-input)',
+                color: 'var(--text)',
+                fontSize: '13.5px',
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+            />
           </div>
-          <div style={{ marginBottom: '16px' }}>
-            <label>Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 6 characters" required />
+
+          <div style={{ marginBottom: '14px' }}>
+            <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 500, color: 'var(--text)', marginBottom: '6px' }}>
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Minimum 6 characters"
+              required
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-input)',
+                color: 'var(--text)',
+                fontSize: '13.5px',
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+            />
           </div>
-          <div style={{ marginBottom: '24px' }}>
-            <label>Confirm Password</label>
-            <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Confirm your password" required />
+
+          <div style={{ marginBottom: '22px' }}>
+            <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 500, color: 'var(--text)', marginBottom: '6px' }}>
+              Confirm password
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              placeholder="Re-enter password"
+              required
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-input)',
+                color: 'var(--text)',
+                fontSize: '13.5px',
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+            />
           </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-            {loading ? 'Creating account...' : 'Sign Up'}
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{
+              width: '100%',
+              padding: '10px 16px',
+              fontSize: '13.5px',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
+            }}
+            disabled={loading}
+          >
+            {loading ? 'Creating account...' : (
+              <>
+                <span>Create Account</span>
+                <FiArrowRight size={14} />
+              </>
+            )}
           </button>
         </form>
-        <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '14px', color: 'var(--text-light)' }}>
-          Already have an account? <Link href="/sign-in">Sign In</Link>
-        </p>
+
+        <div style={{
+          marginTop: '24px',
+          paddingTop: '20px',
+          borderTop: '1px solid var(--border)',
+          textAlign: 'center',
+          fontSize: '13px',
+          color: 'var(--text-light)'
+        }}>
+          Already have an account?{' '}
+          <Link href="/sign-in" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>
+            Sign In
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -107,7 +107,7 @@ export default function ResumePage() {
                       padding: '16px',
                       cursor: 'pointer',
                       borderColor: isSelected ? 'var(--primary)' : 'var(--border)',
-                      background: isSelected ? 'rgba(249, 115, 22, 0.04)' : 'white'
+                      background: isSelected ? 'var(--primary-subtle)' : 'var(--bg-card)'
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

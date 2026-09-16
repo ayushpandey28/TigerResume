@@ -43,5 +43,8 @@ const skillGapSchema = new mongoose.Schema({
   timestamps: true
 });
 
+skillGapSchema.index({ user: 1, createdAt: -1 });
+skillGapSchema.index({ resume: 1, jobDescription: 1 });
+
 module.exports = mongoose.model('SkillGap', skillGapSchema);
 

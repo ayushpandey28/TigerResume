@@ -1,4 +1,5 @@
 'use client';
+import { FiCheckCircle, FiAlertTriangle, FiArrowUpRight } from 'react-icons/fi';
 
 export default function FormattingAnalysis({ strengths = [], weaknesses = [], suggestions = [], formattingIssues = [] }) {
   return (
@@ -10,8 +11,8 @@ export default function FormattingAnalysis({ strengths = [], weaknesses = [], su
       {/* Strengths */}
       {strengths.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--success)', marginBottom: '8px' }}>
-            💪 Resume Strengths
+          <h4 style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--success)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiCheckCircle size={15} /> Verified Strengths
           </h4>
           <ul style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text)' }}>
             {strengths.map((str, i) => (
@@ -24,8 +25,8 @@ export default function FormattingAnalysis({ strengths = [], weaknesses = [], su
       {/* Weaknesses */}
       {weaknesses.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--danger)', marginBottom: '8px' }}>
-            ⚠️ Potential Weaknesses
+          <h4 style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--danger)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiAlertTriangle size={15} /> Formatting & Content Flags
           </h4>
           <ul style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text)' }}>
             {weaknesses.map((w, i) => (
@@ -38,8 +39,8 @@ export default function FormattingAnalysis({ strengths = [], weaknesses = [], su
       {/* Improvement Suggestions */}
       {suggestions.length > 0 && (
         <div>
-          <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary)', marginBottom: '8px' }}>
-            💡 Actionable Suggestions
+          <h4 style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--primary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiArrowUpRight size={15} /> Actionable Recommendations
           </h4>
           <ul style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text)' }}>
             {suggestions.map((sug, i) => (

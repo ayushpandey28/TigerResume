@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 const FILTERS = [
   { id: 'all', label: 'All Activity' },
   { id: 'ats', label: 'ATS Analysis' },
+  { id: 'resume-analysis', label: 'Resume Analysis' },
   { id: 'job-match', label: 'Job Match' },
   { id: 'skill-gap', label: 'Skill Gap' },
   { id: 'github', label: 'GitHub' },
@@ -45,6 +46,7 @@ export default function HistoryPage() {
   const getItemIcon = (type) => {
     switch (type) {
       case 'ats': return <FiTarget style={{ color: 'var(--primary)' }} />;
+      case 'resume-analysis': return <FiTarget style={{ color: 'var(--primary)' }} />;
       case 'job-match': return <FiBarChart2 style={{ color: 'var(--success)' }} />;
       case 'skill-gap': return <FiLayers style={{ color: 'var(--info)' }} />;
       case 'github': return <FiGithub style={{ color: 'var(--text)' }} />;

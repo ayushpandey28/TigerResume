@@ -113,8 +113,8 @@ export default function JobDescriptionPage() {
             <p>Paste, manage, and analyze target Job Descriptions for ATS scoring and skills matching</p>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <Link href="/job-description/generate" className="btn btn-outline">
-              🤖 Generate AI Sample JD
+            <Link href="/job-description/generate" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <FiCpu size={14} /> Generate AI Sample JD
             </Link>
             <button
               onClick={() => { setShowInput(!showInput); setEditingJob(null); }}
@@ -165,7 +165,7 @@ export default function JobDescriptionPage() {
                       padding: '16px',
                       cursor: 'pointer',
                       borderColor: isSelected ? 'var(--primary)' : 'var(--border)',
-                      background: isSelected ? 'rgba(249, 115, 22, 0.04)' : 'white'
+                      background: isSelected ? 'var(--primary-subtle)' : 'var(--bg-card)'
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>

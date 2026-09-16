@@ -1,4 +1,5 @@
 'use client';
+import { FiCheckCircle, FiAlertTriangle } from 'react-icons/fi';
 
 export default function SkillGap({
   skillCoverage = 0,
@@ -36,21 +37,21 @@ export default function SkillGap({
       <div className="grid-2">
         {/* Existing / Matched Skills */}
         <div className="card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--success)', marginBottom: '16px' }}>
-            ✓ Verified Matched Skills ({matchedRequiredSkills.length + matchedPreferredSkills.length})
+          <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--success)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiCheckCircle size={15} /> Verified Matched Skills ({matchedRequiredSkills.length + matchedPreferredSkills.length})
           </h3>
           {matchedRequiredSkills.length === 0 && matchedPreferredSkills.length === 0 ? (
             <p style={{ fontSize: '13px', color: 'var(--text-light)' }}>No overlapping skills found.</p>
           ) : (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {matchedRequiredSkills.map((s, i) => (
-                <span key={`req-${i}`} className="badge badge-success" style={{ fontSize: '13px' }}>
-                  ✓ {s} (Required)
+                <span key={`req-${i}`} className="badge badge-success" style={{ fontSize: '12px' }}>
+                  {s} <span style={{ opacity: 0.8, fontSize: '10.5px' }}>(Required)</span>
                 </span>
               ))}
               {matchedPreferredSkills.map((s, i) => (
-                <span key={`pref-${i}`} className="badge badge-info" style={{ fontSize: '13px' }}>
-                  ✓ {s} (Bonus)
+                <span key={`pref-${i}`} className="badge badge-info" style={{ fontSize: '12px' }}>
+                  {s} <span style={{ opacity: 0.8, fontSize: '10.5px' }}>(Bonus)</span>
                 </span>
               ))}
             </div>
@@ -59,8 +60,8 @@ export default function SkillGap({
 
         {/* Missing Skills & Priority */}
         <div className="card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--danger)', marginBottom: '16px' }}>
-            ⚠ Identified Skill Gaps ({gaps.length})
+          <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--danger)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiAlertTriangle size={15} /> Identified Skill Gaps ({gaps.length})
           </h3>
           {gaps.length === 0 ? (
             <p style={{ fontSize: '13px', color: 'var(--success)' }}>Awesome! Zero missing skills detected.</p>

@@ -50,5 +50,8 @@ const jobMatchSchema = new mongoose.Schema({
   timestamps: true
 });
 
+jobMatchSchema.index({ user: 1, createdAt: -1 });
+jobMatchSchema.index({ resume: 1, jobDescription: 1 });
+
 module.exports = mongoose.model('JobMatch', jobMatchSchema);
 

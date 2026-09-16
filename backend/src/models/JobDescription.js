@@ -36,5 +36,7 @@ const jobDescriptionSchema = new mongoose.Schema({
   timestamps: true
 });
 
+jobDescriptionSchema.index({ user: 1, createdAt: -1 });
+
 module.exports = mongoose.model('JobDescription', jobDescriptionSchema);
 

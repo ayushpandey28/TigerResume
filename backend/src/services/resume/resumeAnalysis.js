@@ -32,17 +32,24 @@ const analyzeResume = async (resumeId, userId) => {
     return aiResult;
   }
 
-  // Save in AnalysisHistory
-  const historyRecord = await AnalysisHistory.create({
-    userId,
-    type: 'optimization',
-    resumeId: resume._id,
-    result: aiResult
-  });
+  // Save in AnalysisHistory with resilient error handling
+  let historyId = null;
+  try {
+    const historyRecord = await AnalysisHistory.create({
+      userId,
+      type: 'resume-analysis',
+      resumeId: resume._id,
+      result: aiResult
+    });
+    historyId = historyRecord._id;
+  } catch (err) {
+    // Non-blocking: analysis succeeded even if history record fails
+    console.error('Failed to save analysis history record:', err.message);
+  }
 
   return {
     available: true,
-    historyId: historyRecord._id,
+    historyId,
     analysis: aiResult
   };
 };

@@ -30,20 +30,20 @@ export default function Creative({ resume, customization = {} }) {
           {contact.name || resume.title || 'Untitled Candidate'}
         </h1>
         <div style={{ fontSize: '12.5px', color: '#475569', marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '8px 14px', wordBreak: 'break-word' }}>
-          {contact.email && <span>📧 {contact.email}</span>}
-          {contact.phone && <span>📱 {contact.phone}</span>}
-          {contact.location && <span>📍 {contact.location}</span>}
-          {contact.linkedin && <span>🌐 {contact.linkedin}</span>}
-          {contact.github && <span>📦 {contact.github}</span>}
-          {contact.website && <span>🔗 {contact.website}</span>}
+          {contact.email && <span>{contact.email}</span>}
+          {contact.phone && <span>{contact.phone}</span>}
+          {contact.location && <span>{contact.location}</span>}
+          {contact.linkedin && <span>{contact.linkedin}</span>}
+          {contact.github && <span>{contact.github}</span>}
+          {contact.website && <span>{contact.website}</span>}
         </div>
       </div>
 
       {/* Summary */}
       {summary && (
         <div style={{ marginBottom: '22px' }}>
-          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>⚡</span> Professional Summary
+          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '8px' }}>
+            Professional Summary
           </h2>
           <p style={{ fontSize: '13px', margin: 0, color: '#334155' }}>{summary}</p>
         </div>
@@ -52,8 +52,8 @@ export default function Creative({ resume, customization = {} }) {
       {/* Skills */}
       {((skillCategories && skillCategories.length > 0) || (skills && skills.length > 0)) && (
         <div style={{ marginBottom: '22px' }}>
-          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>🛠</span> Core Competencies & Tech Stack
+          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '10px' }}>
+            Core Competencies & Tech Stack
           </h2>
           {skillCategories && skillCategories.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -87,8 +87,8 @@ export default function Creative({ resume, customization = {} }) {
       {/* Experience */}
       {experience && experience.length > 0 && (
         <div style={{ marginBottom: '22px' }}>
-          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>💼</span> Professional Experience
+          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '12px' }}>
+            Professional Experience
           </h2>
           {experience.map((exp, i) => (
             <div key={i} style={{ marginBottom: '16px', paddingLeft: '14px', borderLeft: `3px solid ${primaryColor}` }}>
@@ -116,8 +116,8 @@ export default function Creative({ resume, customization = {} }) {
       {/* Projects */}
       {projects && projects.length > 0 && (
         <div style={{ marginBottom: '22px' }}>
-          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>🚀</span> Key Projects
+          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '12px' }}>
+            Key Projects
           </h2>
           {projects.map((proj, i) => (
             <div key={i} style={{ marginBottom: '14px', paddingLeft: '14px', borderLeft: `3px solid ${primaryColor}44` }}>
@@ -153,8 +153,8 @@ export default function Creative({ resume, customization = {} }) {
       {/* Education */}
       {education && education.length > 0 && (
         <div style={{ marginBottom: '22px' }}>
-          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>🎓</span> Education & Qualifications
+          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '10px' }}>
+            Education & Qualifications
           </h2>
           {education.map((edu, i) => (
             <div key={i} style={{ marginBottom: '10px' }}>
@@ -174,8 +174,8 @@ export default function Creative({ resume, customization = {} }) {
       {/* Certifications */}
       {certifications && certifications.length > 0 && (
         <div>
-          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>📜</span> Certifications
+          <h2 style={{ fontSize: '13.5px', fontWeight: 800, textTransform: 'uppercase', color: primaryColor, marginBottom: '8px' }}>
+            Certifications
           </h2>
           <ul style={{ paddingLeft: '18px', margin: 0, fontSize: '13px', color: '#334155' }}>
             {certifications.map((cert, i) => (

@@ -1,4 +1,5 @@
 'use client';
+import { FiTrendingUp, FiTarget, FiLayers } from 'react-icons/fi';
 
 export default function ImprovementSuggestions({ sectionImprovements = [], keywordSuggestions = [], overallSuggestions = [] }) {
   return (
@@ -9,8 +10,8 @@ export default function ImprovementSuggestions({ sectionImprovements = [], keywo
 
       {overallSuggestions.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary)', marginBottom: '8px' }}>
-            💡 Overall Recommendations
+          <h4 style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--primary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiTrendingUp size={15} /> Overall Recommendations
           </h4>
           <ul style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text)' }}>
             {overallSuggestions.map((s, i) => (
@@ -22,8 +23,8 @@ export default function ImprovementSuggestions({ sectionImprovements = [], keywo
 
       {keywordSuggestions.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--info)', marginBottom: '8px' }}>
-            🎯 Supported Keyword Alignments
+          <h4 style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--info)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiTarget size={15} /> Supported Keyword Alignments
           </h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
             {keywordSuggestions.map((kw, i) => (
@@ -35,8 +36,8 @@ export default function ImprovementSuggestions({ sectionImprovements = [], keywo
 
       {sectionImprovements.length > 0 && (
         <div>
-          <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text)', marginBottom: '8px' }}>
-            📌 Section-by-Section Guidance
+          <h4 style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FiLayers size={15} /> Section-by-Section Guidance
           </h4>
           <ul style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text-light)' }}>
             {sectionImprovements.map((sec, i) => (

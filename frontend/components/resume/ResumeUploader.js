@@ -103,8 +103,16 @@ export default function ResumeUploader({ onUploadSuccess }) {
             onClick={handleUpload}
             className="btn btn-primary"
             disabled={loading}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
           >
-            {loading ? 'Processing & Parsing...' : 'Upload & Parse'}
+            {loading ? (
+              <>
+                <span className="spinner" style={{ width: '14px', height: '14px', borderWidth: '2px' }} />
+                Parsing Layout...
+              </>
+            ) : (
+              'Upload & Parse Resume'
+            )}
           </button>
         </div>
       )}

@@ -25,4 +25,6 @@ const profileAnalysisSchema = new mongoose.Schema({
   timestamps: true
 });
 
+profileAnalysisSchema.index({ user: 1, profileType: 1, createdAt: -1 });
+
 module.exports = mongoose.model('ProfileAnalysis', profileAnalysisSchema);
