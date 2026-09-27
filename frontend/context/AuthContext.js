@@ -22,8 +22,10 @@ export function AuthProvider({ children }) {
     try {
       const res = await getUserProfile();
       setUser(res.data.user);
-    } catch {
-      removeToken();
+    } catch (err) {
+      if (err.response?.status === 401) {
+        removeToken();
+      }
       setUser(null);
     } finally {
       setLoading(false);

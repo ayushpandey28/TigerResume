@@ -54,7 +54,7 @@ const compareKeywords = (resumeKeywords, jobKeywords) => {
     const normJobKey = normalizeKeyword(jobKey);
     if (!normJobKey) return;
 
-    if (normalizedResumeSet.has(normJobKey) || Array.from(normalizedResumeSet).some(rk => rk.includes(normJobKey) || normJobKey.includes(rk))) {
+    if (normalizedResumeSet.has(normJobKey)) {
       matched.push(jobKey);
     } else {
       missing.push(jobKey);

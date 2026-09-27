@@ -13,14 +13,24 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'MulterError') {
     statusCode = 400;
     message = err.code === 'LIMIT_FILE_SIZE'
-      ? 'File size exceeds maximum allowed limit of 5MB'
+      ? 'File size exceeds maximum allowed limit of 4MB'
       : `File upload error: ${err.message}`;
+  } else if (err.name === 'ValidationError') {
+    statusCode = 400;
+    message = 'Invalid data provided';
+  } else if (err.code === 11000) {
+    statusCode = 409;
+    message = 'A record with this value already exists';
   } else if (err.name === 'CastError' && err.kind === 'ObjectId') {
     statusCode = 404;
     message = 'Resource not found';
   }
 
-  logger.error(`${message}`);
+  logger.error(err.message || message);
+
+  if (process.env.NODE_ENV === 'production' && statusCode >= 500) {
+    message = 'Internal server error';
+  }
 
   res.status(statusCode).json({
     success: false,

@@ -2,12 +2,18 @@ const cloudinary = require('cloudinary').v2;
 const logger = require('../utils/logger');
 
 let isConfigured = false;
+const placeholders = new Set([
+  'your-cloud-name',
+  'your_cloudinary_cloud_name',
+  'your_cloudinary_api_key',
+  'your_cloudinary_api_secret'
+]);
+const isSetValue = (value) => value && !placeholders.has(value.trim().toLowerCase());
 
 if (
-  process.env.CLOUDINARY_CLOUD_NAME &&
-  process.env.CLOUDINARY_CLOUD_NAME !== 'your-cloud-name' &&
-  process.env.CLOUDINARY_API_KEY &&
-  process.env.CLOUDINARY_API_SECRET
+  isSetValue(process.env.CLOUDINARY_CLOUD_NAME) &&
+  isSetValue(process.env.CLOUDINARY_API_KEY) &&
+  isSetValue(process.env.CLOUDINARY_API_SECRET)
 ) {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

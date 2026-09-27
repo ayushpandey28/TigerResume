@@ -2,12 +2,12 @@ const gemini = require('../../config/gemini');
 const prompts = require('./prompts');
 const logger = require('../../utils/logger');
 
-const wait = (ms) => new Promise(res => setTimeout(res, ms));
-
-const GEMINI_TIMEOUT_MS = parseInt(process.env.GEMINI_TIMEOUT_MS, 10) || 12000;
+const GEMINI_TIMEOUT_MS = parseInt(process.env.GEMINI_TIMEOUT_MS, 10) || 5000;
+const MAX_MODEL_ATTEMPTS = 6;
 
 const withTimeout = (promise, timeoutMs = GEMINI_TIMEOUT_MS) => {
   let timer;
+
   const timeoutPromise = new Promise((_, reject) => {
     timer = setTimeout(() => {
       const err = new Error('Gemini API call timed out');
@@ -21,18 +21,12 @@ const withTimeout = (promise, timeoutMs = GEMINI_TIMEOUT_MS) => {
   });
 };
 
-/**
- * Classify whether an error is model-specific (warranting automatic failover to the next model)
- * or non-model-specific (such as authentication or invalid API key, which must throw immediately).
- */
 const isModelSpecificError = (err) => {
   if (!err) return false;
 
   const msg = (err.message || '').toLowerCase();
   const status = err.status || err.statusCode;
 
-  // 1. Non-model-specific failures: DO NOT FAILOVER
-  // Invalid API key / Auth / Permission failures
   if (
     msg.includes('api_key_invalid') ||
     msg.includes('api key not valid') ||
@@ -46,7 +40,6 @@ const isModelSpecificError = (err) => {
     return false;
   }
 
-  // Account-wide billing or hard quota limits
   if (
     msg.includes('billing disabled') ||
     msg.includes('account quota') ||
@@ -55,8 +48,16 @@ const isModelSpecificError = (err) => {
     return false;
   }
 
-  // 2. Model-specific failures: DO FAILOVER
-  // Model not found / 404 / unsupported / deprecated / shutdown
+  if (
+    msg.includes('invalid argument') ||
+    msg.includes('invalid_argument') ||
+    msg.includes('safety') ||
+    msg.includes('blocked') ||
+    msg.includes('contents must not be empty')
+  ) {
+    return false;
+  }
+
   if (
     status === 404 ||
     msg.includes('404') ||
@@ -71,7 +72,6 @@ const isModelSpecificError = (err) => {
     return true;
   }
 
-  // Model unavailable / transient overload / 503 / 429 / timeouts
   if (
     status === 503 ||
     status === 429 ||
@@ -90,24 +90,38 @@ const isModelSpecificError = (err) => {
     return true;
   }
 
-  // Model-specific 400 (Bad request due to model capability or invalid model identifier)
-  if (status === 400 || msg.includes('400') || msg.includes('invalid model')) {
+  if (
+    (status === 400 || msg.includes('400')) &&
+    (
+      msg.includes('invalid model') ||
+      msg.includes('model not found') ||
+      msg.includes('unsupported model') ||
+      msg.includes('unknown model') ||
+      msg.includes('is not found for api version')
+    )
+  ) {
     return true;
   }
 
-  // Default: if error occurs during Gemini request, treat model failure safely
+  if (status === 400) {
+    return false;
+  }
+
   return true;
 };
 
-/**
- * Format error for user-facing API response
- */
 const formatAIError = (err) => {
   if (err && err.statusCode && err.isControlled) {
     return err;
   }
 
   const msg = err?.message || '';
+  const status = err?.status || err?.statusCode;
+  const isForbidden =
+    status === 403 ||
+    msg.toLowerCase().includes('permission_denied') ||
+    msg.toLowerCase().includes('permission denied');
+
   const isAuth =
     msg.includes('API_KEY_INVALID') ||
     msg.includes('api key not valid') ||
@@ -116,7 +130,7 @@ const formatAIError = (err) => {
 
   if (isAuth) {
     const error = new Error('AI service configuration or authentication failed.');
-    error.statusCode = 401;
+    error.statusCode = isForbidden ? 403 : 401;
     error.isControlled = true;
     return error;
   }
@@ -127,10 +141,6 @@ const formatAIError = (err) => {
   return error;
 };
 
-/**
- * Robust JSON parser for AI responses.
- * Handles fenced markdown, surrounding text, and recoverable trailing commas.
- */
 const parseJSONSafely = (text) => {
   if (text === null || text === undefined || typeof text !== 'string') {
     throw new Error('Response did not contain valid text');
@@ -138,28 +148,31 @@ const parseJSONSafely = (text) => {
 
   let cleaned = text.trim();
 
-  // Strip markdown fencing
-  cleaned = cleaned.replace(/^```(?:json|text)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  cleaned = cleaned
+    .replace(/^```(?:json|text)?\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim();
 
-  // 1. Direct JSON parse
   try {
     return JSON.parse(cleaned);
   } catch (err1) {
-    // 2. Extract JSON structure (object or array) from surrounding text
     const match = cleaned.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+
     if (match) {
       let extracted = match[0].trim();
-      // Remove any lingering code fence markers inside the matched block
-      extracted = extracted.replace(/```(?:json)?|```/gi, '').trim();
+
+      extracted = extracted
+        .replace(/```(?:json)?|```/gi, '')
+        .trim();
+
       try {
         return JSON.parse(extracted);
       } catch (err2) {
-        // 3. Fix recoverable trailing commas before closing braces/brackets
         try {
           const sanitized = extracted.replace(/,\s*([}\]])/g, '$1');
           return JSON.parse(sanitized);
         } catch (err3) {
-          // Fall through
+          // Continue
         }
       }
     }
@@ -168,9 +181,6 @@ const parseJSONSafely = (text) => {
   throw new Error('Response did not contain valid JSON');
 };
 
-/**
- * Centralized Gemini request executor with automatic model failover.
- */
 const executeWithFailover = async (prompt, options = {}) => {
   const isTextOnly = options.isTextOnly === true;
   const timeoutMs = options.timeoutMs || GEMINI_TIMEOUT_MS;
@@ -183,10 +193,25 @@ const executeWithFailover = async (prompt, options = {}) => {
   }
 
   const modelChain = gemini.getModelChain();
+  const attemptedModels = new Set();
+
   let lastError = null;
+  let attempts = 0;
 
   for (let i = 0; i < modelChain.length; i++) {
+    if (attempts >= MAX_MODEL_ATTEMPTS) {
+      break;
+    }
+
     const modelName = modelChain[i];
+
+    if (!modelName || attemptedModels.has(modelName)) {
+      continue;
+    }
+
+    attemptedModels.add(modelName);
+    attempts++;
+
     const modelInstance = gemini.getGenerativeModel(modelName);
 
     if (!modelInstance) {
@@ -194,18 +219,22 @@ const executeWithFailover = async (prompt, options = {}) => {
     }
 
     try {
-      const result = await withTimeout(modelInstance.generateContent(prompt), timeoutMs);
+      const result = await withTimeout(
+        modelInstance.generateContent(prompt),
+        timeoutMs
+      );
+
       const response = result.response;
       const text = response.text();
 
       if (isTextOnly) {
         return text;
       }
+
       return parseJSONSafely(text);
     } catch (err) {
       lastError = err;
 
-      // If JSON parsing fails specifically, do not cycle through models — payload was returned but malformed
       if (err.message === 'Response did not contain valid JSON') {
         logger.error(`JSON parsing error for response from model ${modelName}`);
         throw formatAIError(err);
@@ -213,34 +242,53 @@ const executeWithFailover = async (prompt, options = {}) => {
 
       const isModelError = isModelSpecificError(err);
 
-      if (isModelError && i < modelChain.length - 1) {
-        const nextModel = modelChain[i + 1];
-        const safeReason = (err.message || 'model unavailable')
-          .replace(/key=[^&]+/gi, 'key=***')
-          .replace(/Bearer\s+[^\s]+/gi, 'Bearer ***');
+      if (isModelError && attempts < MAX_MODEL_ATTEMPTS) {
+        let nextModel = null;
 
-        logger.warn(
-          `Primary Gemini model failed (${modelName}). Reason: ${safeReason}. Trying fallback: ${nextModel}`
-        );
-        continue;
+        for (let nextIdx = i + 1; nextIdx < modelChain.length; nextIdx++) {
+          const candidate = modelChain[nextIdx];
+
+          if (candidate && !attemptedModels.has(candidate)) {
+            nextModel = candidate;
+            break;
+          }
+        }
+
+        if (nextModel) {
+          const safeReason = (err.message || 'model unavailable')
+            .replace(/key=[^&]+/gi, 'key=***')
+            .replace(/Bearer\s+[^\s]+/gi, 'Bearer ***');
+
+          logger.warn(
+            `Gemini model failed (${modelName}). Reason: ${safeReason}. Trying fallback: ${nextModel}`
+          );
+
+          continue;
+        }
       }
 
-      // Non-model error or final model failed
       if (!isModelError) {
-        logger.error(`Gemini API request failed with non-model error on ${modelName}:`, err.message);
+        logger.error(
+          `Gemini API request failed with non-model error on ${modelName}:`,
+          err.message
+        );
         throw formatAIError(err);
       }
+
+      break;
     }
   }
 
-  logger.error('All Gemini models in fallback chain failed. Last error:', lastError?.message);
+  logger.error(
+    `All Gemini attempts failed. Last error: ${lastError?.message}`
+  );
+
   throw formatAIError(lastError);
 };
 
 const callGemini = (prompt) => executeWithFailover(prompt, { isTextOnly: false });
 const callGeminiText = (prompt) => executeWithFailover(prompt, { isTextOnly: true });
 
-// --- All 8 AI Features ---
 const analyzeResume = async (resumeData) => {
   const prompt = prompts.resumeAnalysis(resumeData);
   const rawResponse = await callGemini(prompt);
@@ -285,22 +333,27 @@ const analyzeLinkedIn = async (profileData) => {
   return callGemini(prompt);
 };
 
-// --- Response Validators & Normalizers ---
 const validateResumeAnalysisResponse = (res) => {
   if (!res || typeof res !== 'object') {
     res = {};
   }
 
-  const toArray = (val) => (Array.isArray(val) ? val : typeof val === 'string' && val ? [val] : []);
+  const toArray = (val) =>
+    Array.isArray(val) ? val : typeof val === 'string' && val ? [val] : [];
 
   return {
-    overall_assessment: typeof res.overall_assessment === 'string' ? res.overall_assessment : 'Resume analysis completed.',
+    overall_assessment:
+      typeof res.overall_assessment === 'string'
+        ? res.overall_assessment
+        : 'Resume analysis completed.',
     strengths: toArray(res.strengths),
     weaknesses: toArray(res.weaknesses),
     skills_analysis: {
       strong_skills: toArray(res.skills_analysis?.strong_skills),
       skills_to_highlight: toArray(res.skills_analysis?.skills_to_highlight),
-      skills_that_need_context: toArray(res.skills_analysis?.skills_that_need_context)
+      skills_that_need_context: toArray(
+        res.skills_analysis?.skills_that_need_context
+      )
     },
     experience_analysis: {
       strengths: toArray(res.experience_analysis?.strengths),
@@ -311,12 +364,30 @@ const validateResumeAnalysisResponse = (res) => {
       improvements: toArray(res.project_analysis?.improvements)
     },
     section_feedback: {
-      summary: typeof res.section_feedback?.summary === 'string' ? res.section_feedback.summary : '',
-      skills: typeof res.section_feedback?.skills === 'string' ? res.section_feedback.skills : '',
-      education: typeof res.section_feedback?.education === 'string' ? res.section_feedback.education : '',
-      experience: typeof res.section_feedback?.experience === 'string' ? res.section_feedback.experience : '',
-      projects: typeof res.section_feedback?.projects === 'string' ? res.section_feedback.projects : '',
-      certifications: typeof res.section_feedback?.certifications === 'string' ? res.section_feedback.certifications : ''
+      summary:
+        typeof res.section_feedback?.summary === 'string'
+          ? res.section_feedback.summary
+          : '',
+      skills:
+        typeof res.section_feedback?.skills === 'string'
+          ? res.section_feedback.skills
+          : '',
+      education:
+        typeof res.section_feedback?.education === 'string'
+          ? res.section_feedback.education
+          : '',
+      experience:
+        typeof res.section_feedback?.experience === 'string'
+          ? res.section_feedback.experience
+          : '',
+      projects:
+        typeof res.section_feedback?.projects === 'string'
+          ? res.section_feedback.projects
+          : '',
+      certifications:
+        typeof res.section_feedback?.certifications === 'string'
+          ? res.section_feedback.certifications
+          : ''
     },
     suggestions: toArray(res.suggestions)
   };
@@ -324,7 +395,9 @@ const validateResumeAnalysisResponse = (res) => {
 
 const validateJDAnalysisResponse = (res) => {
   if (!res || typeof res !== 'object') res = {};
-  const toArray = (val) => (Array.isArray(val) ? val : typeof val === 'string' && val ? [val] : []);
+
+  const toArray = (val) =>
+    Array.isArray(val) ? val : typeof val === 'string' && val ? [val] : [];
 
   return {
     title: typeof res.title === 'string' && res.title ? res.title : 'Job Position',
@@ -334,53 +407,94 @@ const validateJDAnalysisResponse = (res) => {
     preferredSkills: toArray(res.preferred_skills || res.preferredSkills),
     keywords: toArray(res.keywords),
     responsibilities: toArray(res.responsibilities),
-    experience: typeof res.experience === 'string' && res.experience ? res.experience : 'Not specified',
-    education: typeof res.education === 'string' && res.education ? res.education : 'Not specified'
+    experience:
+      typeof res.experience === 'string' && res.experience
+        ? res.experience
+        : 'Not specified',
+    education:
+      typeof res.education === 'string' && res.education
+        ? res.education
+        : 'Not specified'
   };
 };
 
 const validateJDGenerationResponse = (res, inputData) => {
   if (!res || typeof res !== 'object') res = {};
-  const toArray = (val) => (Array.isArray(val) ? val : typeof val === 'string' && val ? [val] : []);
+
+  const toArray = (val) =>
+    Array.isArray(val) ? val : typeof val === 'string' && val ? [val] : [];
 
   return {
     title: inputData?.jobTitle || res.title || 'Sample Role',
     company: '',
-    description: typeof res.description === 'string' ? res.description : `Sample job description for ${inputData?.jobTitle || 'role'}.`,
+    description:
+      typeof res.description === 'string'
+        ? res.description
+        : `Sample job description for ${inputData?.jobTitle || 'role'}.`,
     requiredSkills: toArray(res.required_skills || res.requiredSkills),
     preferredSkills: toArray(res.preferred_skills || res.preferredSkills),
     keywords: toArray(res.keywords),
     responsibilities: toArray(res.responsibilities),
-    experience: inputData?.experienceLevel || res.experience || 'Entry Level',
-    education: typeof res.education === 'string' ? res.education : "Bachelor's degree",
+    experience:
+      inputData?.experienceLevel || res.experience || 'Entry Level',
+    education:
+      typeof res.education === 'string'
+        ? res.education
+        : "Bachelor's degree",
     isAIGenerated: true
   };
 };
 
 const validateResumeOptimizationResponse = (res) => {
   if (!res || typeof res !== 'object') res = {};
-  const toArray = (val) => (Array.isArray(val) ? val : typeof val === 'string' && val ? [val] : []);
+
+  const toArray = (val) =>
+    Array.isArray(val) ? val : typeof val === 'string' && val ? [val] : [];
 
   return {
     summary: {
-      original: typeof res.summary?.original === 'string' ? res.summary.original : '',
-      improved: typeof res.summary?.improved === 'string' ? res.summary.improved : '',
-      reason: typeof res.summary?.reason === 'string' ? res.summary.reason : 'Improved role focus and clarity.'
+      original:
+        typeof res.summary?.original === 'string'
+          ? res.summary.original
+          : '',
+      improved:
+        typeof res.summary?.improved === 'string'
+          ? res.summary.improved
+          : '',
+      reason:
+        typeof res.summary?.reason === 'string'
+          ? res.summary.reason
+          : 'Improved role focus and clarity.'
     },
-    experience: Array.isArray(res.experience) ? res.experience.map(e => ({
-      original: typeof e.original === 'string' ? e.original : '',
-      improved: typeof e.improved === 'string' ? e.improved : '',
-      reason: typeof e.reason === 'string' ? e.reason : 'Strengthened action verbs and impact.'
-    })) : [],
-    projects: Array.isArray(res.projects) ? res.projects.map(p => ({
-      original: typeof p.original === 'string' ? p.original : '',
-      improved: typeof p.improved === 'string' ? p.improved : '',
-      reason: typeof p.reason === 'string' ? p.reason : 'Enhanced technical clarity and contribution.'
-    })) : [],
+    experience: Array.isArray(res.experience)
+      ? res.experience.map((e) => ({
+          original: typeof e.original === 'string' ? e.original : '',
+          improved: typeof e.improved === 'string' ? e.improved : '',
+          reason:
+            typeof e.reason === 'string'
+              ? e.reason
+              : 'Strengthened action verbs and impact.'
+        }))
+      : [],
+    projects: Array.isArray(res.projects)
+      ? res.projects.map((p) => ({
+          original: typeof p.original === 'string' ? p.original : '',
+          improved: typeof p.improved === 'string' ? p.improved : '',
+          reason:
+            typeof p.reason === 'string'
+              ? p.reason
+              : 'Enhanced technical clarity and contribution.'
+        }))
+      : [],
     skills: {
       current: toArray(res.skills?.current),
-      recommended_to_highlight: toArray(res.skills?.recommended_to_highlight),
-      reason: typeof res.skills?.reason === 'string' ? res.skills.reason : ''
+      recommended_to_highlight: toArray(
+        res.skills?.recommended_to_highlight
+      ),
+      reason:
+        typeof res.skills?.reason === 'string'
+          ? res.skills.reason
+          : ''
     },
     section_improvements: toArray(res.section_improvements),
     keyword_suggestions: toArray(res.keyword_suggestions),

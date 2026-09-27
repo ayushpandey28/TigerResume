@@ -139,32 +139,29 @@ const updateProfile = async (req, res, next) => {
     }
 
     const updateData = {};
-    if (name !== undefined) updateData.name = name.trim();
-    if (phone !== undefined) updateData.phone = phone.trim();
-    if (location !== undefined) updateData.location = location.trim();
-    if (avatar !== undefined) updateData.avatar = avatar.trim();
-    if (headline !== undefined) updateData.headline = headline.trim();
-    if (summary !== undefined) updateData.summary = summary.trim();
-    if (preferredRole !== undefined) updateData.preferredRole = preferredRole.trim();
-    if (experienceLevel !== undefined) updateData.experienceLevel = experienceLevel.trim();
+    ['name', 'phone', 'location', 'avatar', 'headline', 'summary', 'preferredRole', 'experienceLevel'].forEach(f => {
+      if (req.body[f] !== undefined) {
+        updateData[f] = req.body[f] === null ? '' : String(req.body[f]).trim();
+      }
+    });
     if (skills !== undefined && Array.isArray(skills)) {
-      updateData.skills = skills.map(s => s.trim()).filter(Boolean);
+      updateData.skills = skills.map(s => String(s || '').trim()).filter(Boolean);
     }
     if (education !== undefined && Array.isArray(education)) {
-      updateData.education = education.map(e => ({
-        degree: (e.degree || '').trim(),
-        institution: (e.institution || '').trim(),
-        startYear: (e.startYear || '').trim(),
-        endYear: (e.endYear || '').trim(),
-        grade: (e.grade || '').trim()
+      updateData.education = education.filter(Boolean).map(e => ({
+        degree: String(e?.degree || '').trim(),
+        institution: String(e?.institution || '').trim(),
+        startYear: String(e?.startYear || '').trim(),
+        endYear: String(e?.endYear || '').trim(),
+        grade: String(e?.grade || '').trim()
       }));
     }
-    if (links !== undefined && typeof links === 'object') {
+    if (links !== undefined && links !== null && typeof links === 'object') {
       updateData.links = {
-        github: (links.github || '').trim(),
-        linkedin: (links.linkedin || '').trim(),
-        portfolio: (links.portfolio || '').trim(),
-        leetcode: (links.leetcode || '').trim()
+        github: String(links.github || '').trim(),
+        linkedin: String(links.linkedin || '').trim(),
+        portfolio: String(links.portfolio || '').trim(),
+        leetcode: String(links.leetcode || '').trim()
       };
     }
 
@@ -199,5 +196,3 @@ const updateProfile = async (req, res, next) => {
 };
 
 module.exports = { signup, login, getProfile, updateProfile };
-
-

@@ -1,5 +1,6 @@
 const ProfileAnalysis = require('../../models/ProfileAnalysis');
 const aiService = require('../ai/aiService');
+const logger = require('../../utils/logger');
 
 const analyzeLinkedInProfile = async (
   {
@@ -13,15 +14,16 @@ const analyzeLinkedInProfile = async (
   },
   userId
 ) => {
-  // ---------------------------------------------------------
-  // 1. VALIDATE LINKEDIN URL
-  // ---------------------------------------------------------
+  // 1. validate linkedin url
 
   if (!profileUrl || typeof profileUrl !== 'string') {
     throw new Error('Valid LinkedIn profile URL is required');
   }
 
-  const cleanUrl = profileUrl.trim();
+  let cleanUrl = profileUrl.trim();
+  if (!/^https?:\/\//i.test(cleanUrl)) {
+    cleanUrl = `https://${cleanUrl}`;
+  }
 
   let parsedUrl;
 
@@ -42,43 +44,15 @@ const analyzeLinkedInProfile = async (
     );
   }
 
-  // ---------------------------------------------------------
-  // 2. NORMALIZE DATA
-  // ---------------------------------------------------------
+  // 2. normalize data
+  const cleanHeadline = typeof headline === 'string' ? headline.trim() : '';
+  const cleanAbout = typeof about === 'string' ? about.trim() : '';
+  const cleanSkills = Array.isArray(skills) ? skills : [];
+  const cleanExperience = Array.isArray(experience) ? experience : [];
+  const cleanEducation = Array.isArray(education) ? education : [];
+  const cleanProjects = Array.isArray(projects) ? projects : [];
 
-  const cleanHeadline =
-    typeof headline === 'string'
-      ? headline.trim()
-      : '';
-
-  const cleanAbout =
-    typeof about === 'string'
-      ? about.trim()
-      : '';
-
-  const cleanSkills =
-    Array.isArray(skills)
-      ? skills
-      : [];
-
-  const cleanExperience =
-    Array.isArray(experience)
-      ? experience
-      : [];
-
-  const cleanEducation =
-    Array.isArray(education)
-      ? education
-      : [];
-
-  const cleanProjects =
-    Array.isArray(projects)
-      ? projects
-      : [];
-
-  // ---------------------------------------------------------
-  // 3. PROFILE COMPLETENESS
-  // ---------------------------------------------------------
+  // 3. profile completeness
 
   let completeness = 0;
 
@@ -91,9 +65,7 @@ const analyzeLinkedInProfile = async (
 
   completeness = Math.min(completeness, 100);
 
-  // ---------------------------------------------------------
-  // 4. DETERMINISTIC ANALYSIS
-  // ---------------------------------------------------------
+  // 4. deterministic analysis
 
   const strengths = [];
   const gaps = [];
@@ -257,28 +229,28 @@ const analyzeLinkedInProfile = async (
     );
   }
 
-  // ---------------------------------------------------------
-  // 5. AI ANALYSIS
-  // ---------------------------------------------------------
+  // 5. ai analysis
 
   let aiAnalysis = null;
 
   if (aiService.isAIAvailable()) {
-    aiAnalysis = await aiService.analyzeLinkedIn({
-      profileUrl: cleanUrl,
-      headline: cleanHeadline,
-      about: cleanAbout,
-      skills: cleanSkills,
-      experience: cleanExperience,
-      education: cleanEducation,
-      projects: cleanProjects,
-      completeness
-    });
+    try {
+      aiAnalysis = await aiService.analyzeLinkedIn({
+        profileUrl: cleanUrl,
+        headline: cleanHeadline,
+        about: cleanAbout,
+        skills: cleanSkills,
+        experience: cleanExperience,
+        education: cleanEducation,
+        projects: cleanProjects,
+        completeness
+      });
+    } catch {
+      logger.warn('Optional Gemini LinkedIn analysis failed; returning deterministic analysis.');
+    }
   }
 
-  // ---------------------------------------------------------
-  // 6. SAVE RESULT
-  // ---------------------------------------------------------
+  // 6. save result
 
   const analysisPayload = {
     profileType: 'linkedin',
@@ -315,9 +287,7 @@ const analyzeLinkedInProfile = async (
   return record;
 };
 
-// ---------------------------------------------------------
-// HISTORY
-// ---------------------------------------------------------
+// history
 
 const getLinkedInHistory = async (userId) => {
   return ProfileAnalysis
@@ -328,9 +298,7 @@ const getLinkedInHistory = async (userId) => {
     .sort({ createdAt: -1 });
 };
 
-// ---------------------------------------------------------
-// GET BY ID
-// ---------------------------------------------------------
+// get by id
 
 const getLinkedInAnalysisById = async (id, userId) => {
   const record =

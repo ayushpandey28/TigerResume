@@ -129,7 +129,9 @@ export default function GithubAnalysis({ analysisData }) {
           </h3>
           <ol style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text)', lineHeight: '1.6' }}>
             {suggestions.map((sug, i) => (
-              <li key={i} style={{ marginBottom: '6px' }}>{sug}</li>
+              <li key={i} style={{ marginBottom: '6px' }}>
+                {typeof sug === 'string' ? sug : (sug?.suggestion || sug?.text || JSON.stringify(sug))}
+              </li>
             ))}
           </ol>
         </div>

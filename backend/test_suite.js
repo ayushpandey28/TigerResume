@@ -1,6 +1,7 @@
 const assert = require('assert');
 const { parseResume } = require('./src/services/resume/resumeParser');
 const { normalizeResumeData } = require('./src/utils/resumeNormalizer');
+const { compareKeywords } = require('./src/services/ats/keywordService');
 const pdfService = require('./src/services/resume/pdfService');
 
 async function runTestSuite() {
@@ -19,6 +20,13 @@ async function runTestSuite() {
       console.error(`    Error: ${err.message}`);
     }
   }
+
+  test('Do not match keywords by partial substring', () => {
+    const result = compareKeywords(['Java'], ['JavaScript']);
+    assert.deepStrictEqual(result.matched, []);
+    assert.deepStrictEqual(result.missing, ['JavaScript']);
+    assert.strictEqual(result.ratio, 0);
+  });
 
   async function asyncTest(name, fn) {
     total++;

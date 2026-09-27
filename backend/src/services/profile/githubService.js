@@ -1,5 +1,6 @@
 const ProfileAnalysis = require('../../models/ProfileAnalysis');
 const aiService = require('../ai/aiService');
+const logger = require('../../utils/logger');
 
 // Helper: Normalize username from input URL or raw string
 const extractUsername = (input = '') => {
@@ -106,12 +107,16 @@ const analyzeGitHubProfile = async (input, userId) => {
   // 3. Optional AI Insights
   let aiInsights = null;
   if (aiService.isAIAvailable()) {
-    aiInsights = await aiService.analyzeGitHub({
-      username: profileData.login,
-      bio: profileData.bio,
-      topLanguages,
-      repos: processedRepos.slice(0, 5)
-    });
+    try {
+      aiInsights = await aiService.analyzeGitHub({
+        username: profileData.login,
+        bio: profileData.bio,
+        topLanguages,
+        repos: processedRepos.slice(0, 5)
+      });
+    } catch {
+      logger.warn('Optional Gemini GitHub analysis failed; returning deterministic analysis.');
+    }
   }
 
   const analysisPayload = {

@@ -87,10 +87,68 @@ export default function LinkedinAnalysis({ analysisData }) {
             <FiTrendingUp size={15} /> Recommended LinkedIn Profile Enhancements
           </h3>
           <ol style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text)', lineHeight: '1.6' }}>
-            {suggestions.map((sug, i) => (
-              <li key={i} style={{ marginBottom: '6px' }}>{sug}</li>
-            ))}
+            {suggestions.map((sug, i) => {
+              if (typeof sug === 'string') {
+                return <li key={i} style={{ marginBottom: '6px' }}>{sug}</li>;
+              }
+              return (
+                <li key={i} style={{ marginBottom: '10px' }}>
+                  {sug?.priority && (
+                    <span className={`badge ${sug.priority === 'High' ? 'badge-danger' : 'badge-info'}`} style={{ fontSize: '11px', marginRight: '6px' }}>
+                      {sug.priority}
+                    </span>
+                  )}
+                  {sug?.area && <strong style={{ marginRight: '6px' }}>[{sug.area}]:</strong>}
+                  <span>{sug?.suggestion || JSON.stringify(sug)}</span>
+                  {sug?.reason && (
+                    <div style={{ fontSize: '12px', color: 'var(--text-light)', marginTop: '2px' }}>
+                      <em>Reason:</em> {sug.reason}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ol>
+        </div>
+      )}
+
+      {/* AI Deep Analysis (if available) */}
+      {analysisData.aiAnalysis && (
+        <div className="card" style={{ padding: '24px', borderLeft: '4px solid var(--primary)' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 600, marginBottom: '14px', color: 'var(--primary)' }}>
+            Gemini AI Deep Profile Insights
+          </h3>
+          {analysisData.aiAnalysis.overallAssessment?.summary && (
+            <p style={{ fontSize: '13.5px', color: 'var(--text)', lineHeight: '1.6', marginBottom: '16px' }}>
+              {analysisData.aiAnalysis.overallAssessment.summary}
+            </p>
+          )}
+
+          {analysisData.aiAnalysis.headlineAnalysis?.recommendedImprovement && (
+            <div style={{ marginBottom: '12px', padding: '10px 14px', background: 'var(--bg)', borderRadius: '6px', border: '1px solid var(--border)' }}>
+              <strong style={{ fontSize: '12.5px', color: 'var(--primary)' }}>Suggested Headline:</strong>
+              <p style={{ fontSize: '13px', margin: '4px 0 0 0', color: 'var(--text)' }}>
+                {analysisData.aiAnalysis.headlineAnalysis.recommendedImprovement}
+              </p>
+            </div>
+          )}
+
+          {analysisData.aiAnalysis.skillsAnalysis && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', marginTop: '12px' }}>
+              {analysisData.aiAnalysis.skillsAnalysis.strongSkills?.length > 0 && (
+                <div>
+                  <strong style={{ color: 'var(--success)' }}>Strong Skills: </strong>
+                  <span>{analysisData.aiAnalysis.skillsAnalysis.strongSkills.join(', ')}</span>
+                </div>
+              )}
+              {analysisData.aiAnalysis.skillsAnalysis.skillsToHighlight?.length > 0 && (
+                <div>
+                  <strong style={{ color: 'var(--info)' }}>Skills to Promote: </strong>
+                  <span>{analysisData.aiAnalysis.skillsAnalysis.skillsToHighlight.join(', ')}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

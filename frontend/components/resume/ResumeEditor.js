@@ -211,9 +211,9 @@ export default function ResumeEditor({ resume, onSave, onCancel }) {
     } else {
       try {
         const parsed = JSON.parse(rawJson);
-        if (parsed.title) setTitle(parsed.title);
+        if (typeof parsed.title === 'string') setTitle(parsed.title);
         if (parsed.contact) setContact(parsed.contact);
-        if (parsed.summary) setSummary(parsed.summary);
+        if (typeof parsed.summary === 'string') setSummary(parsed.summary);
         if (Array.isArray(parsed.skills)) setSkillsStr(parsed.skills.join(', '));
         if (Array.isArray(parsed.certifications)) setCertificationsStr(parsed.certifications.join(', '));
         if (Array.isArray(parsed.experience)) {

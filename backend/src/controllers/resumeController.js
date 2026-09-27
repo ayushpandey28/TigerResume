@@ -8,6 +8,7 @@ const documentModelService = require('../services/resume/documentModelService');
 const { cloudinary, isConfigured: isCloudinaryConfigured } = require('../config/cloudinary');
 const { success, error } = require('../utils/response');
 const logger = require('../utils/logger');
+const resumeAnalysis = require('../services/resume/resumeAnalysis');
 
 // Upload & parse PDF resume
 const uploadResume = async (req, res, next) => {
@@ -70,8 +71,9 @@ const uploadResume = async (req, res, next) => {
       }
     }
 
-    const title = (documentModel.header?.name || parsedData.contact.name)
-      ? `${documentModel.header?.name || parsedData.contact.name}'s Resume`
+    const contactName = documentModel.header?.name || parsedData?.contact?.name;
+    const title = contactName
+      ? `${contactName}'s Resume`
       : req.file.originalname.replace(/\.[^/.]+$/, '');
 
     // Save Resume document in MongoDB with originalDocument, buffer backup, documentModel, and all parsed sections
@@ -166,7 +168,10 @@ const updateResume = async (req, res, next) => {
     } = req.body;
 
     if (title) resume.title = title;
-    if (contact) resume.contact = { ...resume.contact, ...contact };
+    if (contact) {
+      const existingContact = resume.contact?.toObject ? resume.contact.toObject() : (resume.contact || {});
+      resume.contact = { ...existingContact, ...contact };
+    }
     if (summary !== undefined) resume.summary = summary;
     if (skills) resume.skills = skills;
     if (skillCategories) resume.skillCategories = skillCategories;
@@ -404,7 +409,6 @@ const getResumeVersion = async (req, res, next) => {
 // AI Analysis endpoint
 const analyzeResumeWithAI = async (req, res, next) => {
   try {
-    const resumeAnalysis = require('../services/resume/resumeAnalysis');
     const result = await resumeAnalysis.analyzeResume(req.params.id, req.user._id);
     return success(res, result, 'Resume AI analysis completed successfully');
   } catch (err) {
@@ -415,7 +419,6 @@ const analyzeResumeWithAI = async (req, res, next) => {
 // AI Analysis History endpoint
 const getResumeAnalysisHistory = async (req, res, next) => {
   try {
-    const resumeAnalysis = require('../services/resume/resumeAnalysis');
     const history = await resumeAnalysis.getAnalysisHistory(req.params.id, req.user._id);
     return success(res, history, 'Analysis history retrieved successfully');
   } catch (err) {

@@ -314,8 +314,35 @@ async function runGeminiFailoverTestSuite() {
       }
     });
 
-    // --- TEST 10: Malformed JSON ---
-    await test('TEST 10: Malformed JSON (Safe parsing / error handling)', async () => {
+    await test('TEST 10: Permission denied returns 403 without trying other models', async () => {
+      process.env.GEMINI_API_KEY = 'test-valid-api-key';
+      delete process.env.GEMINI_MODEL;
+      geminiConfig.resetForTesting();
+
+      let attempts = 0;
+      const originalGetGenerativeModel = geminiConfig.getGenerativeModel;
+      geminiConfig.getGenerativeModel = () => ({
+        generateContent: async () => {
+          attempts++;
+          const err = new Error('PERMISSION_DENIED: permission denied');
+          err.status = 403;
+          throw err;
+        }
+      });
+
+      try {
+        await geminiService.executeWithFailover('test prompt');
+        assert.fail('Should have thrown permission error');
+      } catch (err) {
+        assert.strictEqual(attempts, 1);
+        assert.strictEqual(err.statusCode, 403);
+      } finally {
+        geminiConfig.getGenerativeModel = originalGetGenerativeModel;
+      }
+    });
+
+    // --- TEST 11: Malformed JSON ---
+    await test('TEST 11: Malformed JSON (Safe parsing / error handling)', async () => {
       assert.throws(() => {
         geminiService.parseJSONSafely('this is not json at all {broken');
       }, /Response did not contain valid JSON/);
@@ -327,8 +354,8 @@ async function runGeminiFailoverTestSuite() {
       assert.strictEqual(parsed.skills.length, 2);
     });
 
-    // --- TEST 11: Markdown fenced JSON ---
-    await test('TEST 11: Markdown fenced JSON (Correct parsing)', async () => {
+    // --- TEST 12: Markdown fenced JSON ---
+    await test('TEST 12: Markdown fenced JSON (Correct parsing)', async () => {
       const fenced = '```json\n{\n  "overall_assessment": "Excellent resume."\n}\n```';
       const parsed = geminiService.parseJSONSafely(fenced);
       assert.strictEqual(parsed.overall_assessment, 'Excellent resume.');
@@ -342,8 +369,8 @@ async function runGeminiFailoverTestSuite() {
       assert.strictEqual(parsedSurrounded.score, 95);
     });
 
-    // --- TEST 12: Concurrent AI requests ---
-    await test('TEST 12: Concurrent AI requests (No race conditions or client duplication)', async () => {
+    // --- TEST 13: Concurrent AI requests ---
+    await test('TEST 13: Concurrent AI requests (No race conditions or client duplication)', async () => {
       process.env.GEMINI_API_KEY = 'test-valid-api-key';
       delete process.env.GEMINI_MODEL;
       geminiConfig.resetForTesting();
@@ -376,8 +403,8 @@ async function runGeminiFailoverTestSuite() {
       }
     });
 
-    // --- TEST 13: Existing AI service APIs ---
-    await test('TEST 13: Verify all 8 existing AI methods continue working contractually', async () => {
+    // --- TEST 14: Existing AI service APIs ---
+    await test('TEST 14: Verify all 8 existing AI methods continue working contractually', async () => {
       process.env.GEMINI_API_KEY = 'test-valid-api-key';
       delete process.env.GEMINI_MODEL;
       geminiConfig.resetForTesting();
@@ -438,7 +465,7 @@ async function runGeminiFailoverTestSuite() {
 
   console.log(`\nGEMINI FAILOVER TEST SUITE SUMMARY: ${passed}/${total} tests passed.`);
   if (passed === total) {
-    console.log('ALL 13 GEMINI FAILOVER TESTS PASSED SUCCESSFULLY! ✓\n');
+    console.log('ALL 14 GEMINI FAILOVER TESTS PASSED SUCCESSFULLY! ✓\n');
   } else {
     process.exit(1);
   }

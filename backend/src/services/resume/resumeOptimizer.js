@@ -64,6 +64,11 @@ const applyImprovement = async ({ resumeId, originalVersion, acceptedChanges }, 
 
   // Verify original version matches or is valid
   const currentVersion = resume.currentVersion || 1;
+  if (originalVersion !== undefined && Number(originalVersion) !== currentVersion) {
+    const error = new Error('Resume changed after analysis. Re-run optimization before applying changes.');
+    error.statusCode = 409;
+    throw error;
+  }
 
   // Apply accepted changes strictly to allowed resume fields
   if (acceptedChanges.summary !== undefined && typeof acceptedChanges.summary === 'string') {
@@ -71,16 +76,41 @@ const applyImprovement = async ({ resumeId, originalVersion, acceptedChanges }, 
   }
 
   if (Array.isArray(acceptedChanges.experience)) {
-    resume.experience = acceptedChanges.experience;
+    resume.experience = acceptedChanges.experience.map(item => {
+      if (typeof item === 'string') return { description: item };
+      if (item && typeof item === 'object') {
+        return {
+          title: item.title || '',
+          company: item.company || '',
+          duration: item.duration || '',
+          location: item.location || '',
+          description: item.improved || item.description || '',
+          bullets: Array.isArray(item.bullets) ? item.bullets : []
+        };
+      }
+      return item;
+    });
   }
 
   if (Array.isArray(acceptedChanges.projects)) {
-    resume.projects = acceptedChanges.projects;
+    resume.projects = acceptedChanges.projects.map(item => {
+      if (typeof item === 'string') return { description: item };
+      if (item && typeof item === 'object') {
+        return {
+          name: item.name || '',
+          description: item.improved || item.description || '',
+          technologies: Array.isArray(item.technologies) ? item.technologies : [],
+          link: item.link || '',
+          bullets: Array.isArray(item.bullets) ? item.bullets : []
+        };
+      }
+      return item;
+    });
   }
 
   if (Array.isArray(acceptedChanges.skills)) {
     // Only update skills if provided as valid array
-    resume.skills = acceptedChanges.skills;
+    resume.skills = acceptedChanges.skills.filter(s => typeof s === 'string' && s.trim());
   }
 
   // Increment version number

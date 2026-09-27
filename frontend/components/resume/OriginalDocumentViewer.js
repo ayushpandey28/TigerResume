@@ -11,24 +11,32 @@ export default function OriginalDocumentViewer({ resume }) {
 
   useEffect(() => {
     let activeUrl = null;
+    let cancelled = false;
     if (resume?._id) {
       setLoading(true);
       setError(null);
+      setBlobUrl(null);
       getOriginalResumeBlob(resume._id)
         .then((blob) => {
-          activeUrl = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
-          setBlobUrl(activeUrl);
+          const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+          if (cancelled) {
+            window.URL.revokeObjectURL(url);
+            return;
+          }
+          activeUrl = url;
+          setBlobUrl(url);
         })
         .catch((err) => {
           console.error('Failed to load original PDF:', err);
-          setError('Could not load in-browser preview of original document.');
+          if (!cancelled) setError('Could not load in-browser preview of original document.');
         })
         .finally(() => {
-          setLoading(false);
+          if (!cancelled) setLoading(false);
         });
     }
 
     return () => {
+      cancelled = true;
       if (activeUrl) {
         window.URL.revokeObjectURL(activeUrl);
       }

@@ -11,8 +11,8 @@ export default function ResumeUploader({ onUploadSuccess }) {
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     if (rejectedFiles && rejectedFiles.length > 0) {
       const rejection = rejectedFiles[0];
-      if (rejection.file.size > 5 * 1024 * 1024) {
-        toast.error('File size exceeds 5MB limit');
+      if (rejection.file.size > 4 * 1024 * 1024) {
+        toast.error('File size exceeds 4MB limit');
       } else {
         toast.error('Only PDF files are allowed');
       }
@@ -28,7 +28,7 @@ export default function ResumeUploader({ onUploadSuccess }) {
     onDrop,
     accept: { 'application/pdf': ['.pdf'] },
     multiple: false,
-    maxSize: 5 * 1024 * 1024
+    maxSize: 4 * 1024 * 1024
   });
 
   const handleUpload = async () => {
@@ -72,7 +72,7 @@ export default function ResumeUploader({ onUploadSuccess }) {
           {isDragActive ? 'Drop your PDF resume here' : 'Drag & drop your resume PDF here'}
         </h3>
         <p style={{ color: 'var(--text-light)', fontSize: '14px', marginBottom: '16px' }}>
-          Supports PDF format only (Max size: 5MB)
+          Supports PDF format only (Max size: 4MB)
         </p>
         <button type="button" className="btn btn-outline" style={{ pointerEvents: 'none' }}>
           Browse File

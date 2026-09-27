@@ -9,16 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "^14.0.4",
+    "axios": "^1.6.2",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "next": "^15.5.26",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "axios": "^1.6.2",
-    "react-icons": "^4.12.0",
-    "react-hot-toast": "^2.4.1",
     "react-dropzone": "^14.2.3",
-    "recharts": "^2.10.3",
+    "react-hot-toast": "^2.4.1",
+    "react-icons": "^4.12.0",
     "react-markdown": "^9.0.1",
-    "jspdf": "^2.5.1",
-    "html2canvas": "^1.4.1"
+    "recharts": "^2.10.3"
   }
 }

@@ -42,15 +42,9 @@ const analyzeProfile = async (req, res, next) => {
 
 const getHistory = async (req, res, next) => {
   try {
-    const history = await linkedinService.getLinkedInHistory(
-      req.user._id
-    );
+    const history = await linkedinService.getLinkedInHistory(req.user._id);
 
-    return success(
-      res,
-      history,
-      'LinkedIn analysis history retrieved successfully'
-    );
+    return success(res, history, 'LinkedIn analysis history retrieved successfully');
   } catch (err) {
     next(err);
   }
@@ -58,17 +52,9 @@ const getHistory = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
   try {
-    const analysis =
-      await linkedinService.getLinkedInAnalysisById(
-        req.params.id,
-        req.user._id
-      );
+    const analysis = await linkedinService.getLinkedInAnalysisById(req.params.id, req.user._id);
 
-    return success(
-      res,
-      analysis,
-      'LinkedIn analysis retrieved successfully'
-    );
+    return success(res, analysis, 'LinkedIn analysis retrieved successfully');
   } catch (err) {
     next(err);
   }

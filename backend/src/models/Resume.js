@@ -111,7 +111,6 @@ const resumeSchema = new mongoose.Schema({
 });
 
 resumeSchema.index({ user: 1, createdAt: -1 });
-resumeSchema.index({ user: 1, isDefault: 1 });
 
 module.exports = mongoose.model('Resume', resumeSchema);
 

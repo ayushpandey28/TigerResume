@@ -25,19 +25,26 @@ export default function ChatBox({ resumeId, jobDescriptionId }) {
   };
 
   useEffect(() => {
+    let active = true;
+    setMessages([]);
     if (resumeId) {
       setFetchingHistory(true);
       getChatHistory(resumeId)
         .then(res => {
-          setMessages(res.data?.messages || []);
+          if (active) setMessages(res.data?.messages || []);
         })
         .catch(() => {
-          setMessages([]);
+          if (active) setMessages([]);
         })
         .finally(() => {
-          setFetchingHistory(false);
+          if (active) setFetchingHistory(false);
         });
+    } else {
+      setFetchingHistory(false);
     }
+    return () => {
+      active = false;
+    };
   }, [resumeId]);
 
   useEffect(() => {
@@ -101,6 +108,7 @@ export default function ChatBox({ resumeId, jobDescriptionId }) {
           <button
             onClick={handleClearChat}
             className="btn btn-outline"
+            disabled={loading || fetchingHistory}
             style={{ fontSize: '12px', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--danger)', borderColor: 'var(--border)' }}
           >
             <FiTrash2 /> Reset Chat
@@ -171,13 +179,13 @@ export default function ChatBox({ resumeId, jobDescriptionId }) {
             value={inputMessage}
             onChange={e => setInputMessage(e.target.value)}
             placeholder="Type a question about your resume..."
-            disabled={loading || !resumeId}
+            disabled={loading || fetchingHistory || !resumeId}
             style={{ flex: 1, padding: '12px 16px', fontSize: '14px', borderRadius: '8px' }}
           />
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={loading || !inputMessage.trim() || !resumeId}
+            disabled={loading || fetchingHistory || !inputMessage.trim() || !resumeId}
             style={{ padding: '12px 20px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}
           >
             <FiSend /> Send

@@ -32,10 +32,9 @@ export default function JobDescriptionPage() {
     try {
       setLoading(true);
       const res = await fetchJobDescriptions();
-      setJobs(res.data || []);
-      if (res.data && res.data.length > 0 && !activeJob) {
-        setActiveJob(res.data[0]);
-      }
+      const loadedJobs = res.data || [];
+      setJobs(loadedJobs);
+      setActiveJob(current => loadedJobs.find(job => job._id === current?._id) || loadedJobs[0] || null);
     } catch (err) {
       toast.error('Failed to load job descriptions');
     } finally {
@@ -51,19 +50,26 @@ export default function JobDescriptionPage() {
     }
   }, [user, authLoading, router]);
 
-  const handleCreateJob = async (formData) => {
-    const res = await createJobDescription(formData);
-    toast.success('Job description saved!');
+  const handleSaveJob = async (formData) => {
+    const res = editingJob
+      ? await updateJobDescriptionData(editingJob._id, formData)
+      : await createJobDescription(formData);
+    toast.success(editingJob ? 'Job description updated!' : 'Job description saved!');
     setShowInput(false);
+    setEditingJob(null);
     await loadJobs();
     if (res.data) setActiveJob(res.data);
   };
 
-  const handleCreateAndAnalyze = async (formData) => {
-    const res = await createJobDescription(formData);
-    toast.success('Job description saved! Running AI analysis...');
+  const handleSaveAndAnalyze = async (formData) => {
+    const res = editingJob
+      ? await updateJobDescriptionData(editingJob._id, formData)
+      : await createJobDescription(formData);
+    toast.success(editingJob ? 'Job description updated! Running AI analysis...' : 'Job description saved! Running AI analysis...');
     setShowInput(false);
+    setEditingJob(null);
     if (res.data) {
+      await loadJobs();
       await handleAnalyze(res.data._id);
     }
   };
@@ -129,8 +135,9 @@ export default function JobDescriptionPage() {
         {showInput && (
           <div style={{ marginBottom: '24px' }}>
             <JobInput
-              onSave={handleCreateJob}
-              onAnalyze={handleCreateAndAnalyze}
+              key={editingJob?._id || 'new'}
+              onSave={handleSaveJob}
+              onAnalyze={handleSaveAndAnalyze}
               initialData={editingJob}
             />
           </div>
@@ -204,6 +211,13 @@ export default function JobDescriptionPage() {
                     Created on {new Date(activeJob.createdAt).toLocaleDateString()}
                   </span>
                   <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => { setEditingJob(activeJob); setShowInput(true); }}
+                      className="btn btn-outline"
+                      style={{ padding: '6px 14px', fontSize: '13px' }}
+                    >
+                      <FiEdit /> Edit Job Description
+                    </button>
                     <button
                       onClick={() => handleAnalyze(activeJob._id)}
                       className="btn btn-primary"

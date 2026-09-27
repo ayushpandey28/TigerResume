@@ -42,9 +42,7 @@ api.interceptors.response.use(
   }
 );
 
-// ============================================================
 // AUTH API
-// ============================================================
 
 export const signupUser = async (name, email, password) => {
   const response = await api.post('/auth/signup', {
@@ -75,10 +73,7 @@ export const updateUserProfile = async (data) => {
   return response.data;
 };
 
-
-// ============================================================
 // RESUME API
-// ============================================================
 
 export const uploadResumeFile = async (file) => {
   const formData = new FormData();
@@ -157,9 +152,7 @@ export const generateEditedResumePdf = async (id) => {
   return response.data;
 };
 
-// ============================================================
 // ATS API
-// ============================================================
 
 export const analyzeATS = async ({
   resumeId,
@@ -185,9 +178,7 @@ export const fetchATSResult = async (id) => {
   return response.data;
 };
 
-// ============================================================
 // AI RESUME ANALYSIS API
-// ============================================================
 
 export const analyzeResumeAI = async (resumeId) => {
   const response = await api.post(
@@ -197,9 +188,7 @@ export const analyzeResumeAI = async (resumeId) => {
   return response.data;
 };
 
-// ============================================================
 // JOB DESCRIPTION API
-// ============================================================
 
 export const createJobDescription = async (data) => {
   const response = await api.post('/jobs', data);
@@ -234,9 +223,7 @@ export const analyzeJobDescriptionAI = async (id) => {
   return response.data;
 };
 
-// ============================================================
 // JOB MATCH API
-// ============================================================
 
 export const matchResumeToJobAPI = async ({
   resumeId,
@@ -255,9 +242,7 @@ export const fetchJobMatchHistory = async () => {
   return response.data;
 };
 
-// ============================================================
 // RESUME IMPROVEMENT API
-// ============================================================
 
 export const analyzeResumeImprovement = async ({
   resumeId,
@@ -271,30 +256,21 @@ export const analyzeResumeImprovement = async ({
   return response.data;
 };
 
-/*
- * Apply accepted AI resume improvements.
- *
- * Backend expects:
- * {
- *   resumeId,
- *   acceptedChanges
- * }
- */
 export const applyResumeImprovement = async ({
   resumeId,
+  originalVersion,
   acceptedChanges
 }) => {
   const response = await api.post('/improvement/apply', {
     resumeId,
+    originalVersion,
     acceptedChanges
   });
 
   return response.data;
 };
 
-// ============================================================
 // SKILL GAP API
-// ============================================================
 
 export const analyzeSkillGapAPI = async ({
   resumeId,
@@ -313,9 +289,7 @@ export const fetchSkillGapHistory = async () => {
   return response.data;
 };
 
-// ============================================================
 // GITHUB API
-// ============================================================
 
 export const analyzeGithubAPI = async (input) => {
   const payload =
@@ -341,9 +315,7 @@ export const fetchGithubAnalysisById = async (id) => {
   return response.data;
 };
 
-// ============================================================
 // LINKEDIN API
-// ============================================================
 
 export const analyzeLinkedinAPI = async (data) => {
   const response = await api.post(
@@ -359,9 +331,7 @@ export const fetchLinkedinHistory = async () => {
   return response.data;
 };
 
-// ============================================================
 // AI RESUME CHAT API
-// ============================================================
 
 export const sendChatMessage = async ({
   resumeId,
@@ -395,9 +365,7 @@ export const deleteChatHistory = async (resumeId) => {
   return response.data;
 };
 
-// ============================================================
 // AI JOB DESCRIPTION GENERATOR
-// ============================================================
 
 export const generateJobDescriptionAI = async (data) => {
   const response = await api.post(
@@ -408,9 +376,7 @@ export const generateJobDescriptionAI = async (data) => {
   return response.data;
 };
 
-// ============================================================
 // RESUME PDF EXPORT
-// ============================================================
 
 export const generateResumePdf = async (
   resumeId,
@@ -435,18 +401,14 @@ export const generateResumePdf = async (
   return response.data;
 };
 
-// ============================================================
 // DASHBOARD API
-// ============================================================
 
 export const fetchDashboardSummary = async () => {
   const response = await api.get('/dashboard');
   return response.data;
 };
 
-// ============================================================
 // HISTORY API
-// ============================================================
 
 export const fetchUserHistory = async (type) => {
   const url =
@@ -459,8 +421,6 @@ export const fetchUserHistory = async (type) => {
   return response.data;
 };
 
-// ============================================================
 // DEFAULT EXPORT
-// ============================================================
 
 export default api;

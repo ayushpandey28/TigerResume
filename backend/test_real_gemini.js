@@ -1,3 +1,4 @@
+require('dotenv').config();
 const geminiConfig = require('./src/config/gemini');
 const geminiService = require('./src/services/ai/geminiService');
 const logger = require('./src/utils/logger');

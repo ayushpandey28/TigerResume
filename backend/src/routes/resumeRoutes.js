@@ -18,7 +18,6 @@ const {
 
 const { upload } = require('../middlewares/uploadMiddleware');
 const { protect } = require('../middlewares/authMiddleware');
-const { apiLimiter } = require('../middlewares/rateLimit');
 
 router.use(protect);
 
@@ -39,7 +38,7 @@ router.post('/:id/pdf', generatePdf);
 router.post('/:id/pdf/edited', generateEditedPdf);
 
 // AI Analysis routes
-router.post('/:id/analyze', apiLimiter, analyzeResumeWithAI);
+router.post('/:id/analyze', analyzeResumeWithAI);
 router.get('/:id/analysis', getResumeAnalysisHistory);
 
 // Versions routes

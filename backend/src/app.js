@@ -41,11 +41,12 @@ app.use(cors({
 
     try {
       const parsedUrl = new URL(origin);
+      const isProjectVercel = parsedUrl.hostname === 'tiger-resume.vercel.app';
       if (
         allowedOrigins.includes(origin) ||
         allowedOrigins.includes('*') ||
         process.env.NODE_ENV !== 'production' ||
-        /\.vercel\.app$/.test(parsedUrl.hostname)
+        isProjectVercel
       ) {
         return callback(null, true);
       }

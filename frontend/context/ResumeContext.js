@@ -30,10 +30,7 @@ export function ResumeProvider({ children }) {
       const data = res.data || [];
 
       setResumes(data);
-
-      if (data.length > 0) {
-        setActiveResume(prev => prev || data[0]);
-      }
+      setActiveResume(prev => data.find(resume => resume._id === prev?._id) || data[0] || null);
 
       return data;
     } catch (err) {
