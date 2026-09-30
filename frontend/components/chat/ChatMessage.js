@@ -34,8 +34,6 @@ export default function ChatMessage({ role, content }) {
         }}>
           {isUser ? <FiUser /> : <FiCpu />}
         </div>
-
-        {/* Message Content */}
         <div style={{
           background: isUser ? 'var(--primary)' : 'var(--bg-card)',
           border: isUser ? 'none' : '1px solid var(--border)',
