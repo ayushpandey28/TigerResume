@@ -1,4 +1,3 @@
-//thisis for chat history
 const mongoose = require('mongoose');
 
 const chatHistorySchema = new mongoose.Schema({
