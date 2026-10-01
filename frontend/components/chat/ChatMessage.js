@@ -1,6 +1,6 @@
 'use client';
 import { FiUser, FiCpu } from 'react-icons/fi';
-
+//....
 export default function ChatMessage({ role, content }) {
   const isUser = role === 'user';
 
