@@ -257,7 +257,7 @@ cd frontend
 npm run build
 ```
 
----
+----
 
 ## ✅ Verified Areas
 
