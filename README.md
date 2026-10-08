@@ -2,7 +2,7 @@
 
 ### AI-Powered Resume Intelligence & Career Optimization Platform
 
-TigerResume is a full-stack platform for uploading, analyzing, optimizing, editing, and matching resumes — while always preserving the original uploaded document. It brings together resume parsing, ATS analysis, AI-powered optimization, job matching, skill-gap analysis, GitHub/LinkedIn insights, editable document models, resume templates, and multi-page PDF generation in one place..
+TigerResume is a full-stack platform for uploading, analyzing, optimizing, editing, and matching resumes — while always preserving the original uploaded document. It brings together resume parsing, ATS analysis, AI-powered optimization, job matching, skill-gap analysis, GitHub/LinkedIn insights, editable document models, resume templates, and multi-page PDF generation in one place.
 
 ---
 
