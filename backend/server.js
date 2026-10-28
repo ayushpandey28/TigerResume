@@ -2,15 +2,12 @@ require('dotenv').config();
 const app = require('./src/app');
 const connectDB = require('./src/config/db');
 const logger = require('./src/utils/logger');
-
 const PORT = process.env.PORT || 5000;
-
 if (process.env.MONGODB_URI) {
   connectDB().catch((err) => {
     logger.warn(`Initial background database connection attempt: ${err.message}`);
   });
 }
-
 if (require.main === module) {
   const startServer = async () => {
     try {
@@ -23,9 +20,7 @@ if (require.main === module) {
       process.exit(1);
     }
   };
-
   startServer();
 }
-
 module.exports = app;
 
